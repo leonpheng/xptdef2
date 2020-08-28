@@ -844,12 +844,11 @@ step1<-function(working.folder){
       #xptconvert=c("1","1","1"),
       Program=c("NA","phxsetting",""),
       description=c("PK dataset","Posthoc","Phoenix settings")	,
-      sourcepath=c("copy/paste location"),
-      progNo="identify the main programs with #1 or #2 etc.",
-      proNo.input="associate input data to #1 or #2 or #1#2",
-      proNo.output="associate output data to #1 or #2 or #1#2",
-      progNo.dependent="associate dependent R functions/package with #1 or #2 or #1#2..NOTE:that these R functions should be included as program but do not assign any number in progNo"
-    )
+      sourcepath=c("copy/paste","path",""),
+      progNo=c("identify","main prog","ex. #1,#2"),
+      proNo.input=c("identify","associated file","ex.#1#2"),
+      proNo.output=c("identify","associated file","ex.#1#2"),
+      progNo.dependent=c("identify","associated file","ex.#1#2..NOTE:that these R functions should be included as program but do not assign any number in progNo"))
     write.csv(lf,"list of files.csv")
   }}
 
