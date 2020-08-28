@@ -1,0 +1,11 @@
+Package: xptdef2
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Leon",
+           family = "Pheng",
+           role = c("aut", "cre"),
+           email = "lhpheng@example.com",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: What the package does (one paragraph).
+RoxygenNote: 7.1.1
