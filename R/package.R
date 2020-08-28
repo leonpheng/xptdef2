@@ -649,19 +649,19 @@ op<-paste0("./programs/",prog[i])
 tab[i,1] = pot(prog[i],hyperlink =op,
 textBold( color = '#0000EE', underline = F ) )+ " \n(original:" +pot(origprog[i])+")"
 
-      io1<-lst[grep(prono[i],lst$proNo.input)&!is.na(lst$proNo.input),]
-      io2<-lst[grep(prono[i],lst$proNo.output)&!is.na(lst$proNo.output),]
-      io3<-lst[grep(prono[i],lst$progNo.dependent)&!is.na(lst$progNo.dependent),]
+      io1<-lst[grep(prono[i],lst$proNo.input)&lst$proNo.input!="",]
+      io2<-lst[grep(prono[i],lst$proNo.output)&lst$proNo.output!="",]
+      io3<-lst[grep(prono[i],lst$progNo.dependent)&lst$progNo.dependent!="",]
 
 if(nrow(io1)==0){
-tt =  pot("",textBold())
+tt =  pot("Input",textBold())
 }else{
 for(io in 1:nrow(io1)){
 txtins<-paste0(io1$rename[io],".xpt")
 insert<-paste0("./datasets/",txtins)
 orf<-paste0("(original:",io1$filename[io],")")
 if(io==1){
-tt=pot("Input",textBold())+"\n "+ pot(txtins,hyperlink= insert,
+tt=pot(txtins,hyperlink= insert,
          textBold( color = '#0000EE', underline = F ) )+"\n  "+pot(orf,textNormal())+"\n"
    }else{
 tt =pot(txtins,hyperlink= insert,textBold( color = '#0000EE', underline = F ))+"\n  "+pot(orf,textNormal())
@@ -691,7 +691,7 @@ tt1 =  pot("",textBold())
       }else{
         tt2=pot(txtins,hyperlink= insert,textBold( color = '#0000EE', underline = F ) )+"\n  "+pot(orf,textNormal())}}}
 
-  tab[i,3] =tt+"\n  "+pot("Output",textBold())+"\n  "+tt1+"\n  "+pot("Dependent",textBold())+"\n  "+tt2
+  tab[i,3] =pot("Input",textBold())+"\n "+tt+"\n  "+pot("Output",textBold())+"\n  "+tt1+"\n  "+pot("Dependent",textBold())+"\n  "+tt2
 }}}else{
 if(length(dir(progdir))>=1&nrow(IOD)==0){
   tab3data<-data.frame(Original=origprog,
