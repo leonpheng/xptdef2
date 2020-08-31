@@ -649,50 +649,56 @@ op<-paste0("./programs/",prog[i])
 tab[i,1] = pot(prog[i],hyperlink =op,
 textBold( color = '#0000EE', underline = F ) )+ " \n(original:" +pot(origprog[i])+")"
 
-      io1<-lst[grep(prono[i],lst$proNo.input)&lst$proNo.input!="",]
-      io2<-lst[grep(prono[i],lst$proNo.output)&lst$proNo.output!="",]
-      io3<-lst[grep(prono[i],lst$progNo.dependent)&lst$progNo.dependent!="",]
+      io1<-lst[grep(prono[i],lst$proNo.input),]
+      io2<-lst[grep(prono[i],lst$proNo.output),]
+      io3<-lst[grep(prono[i],lst$progNo.dependent),]
 
 if(nrow(io1)==0){
 tt =  pot("Input",textBold())
 }else{
-for(io in 1:nrow(io1)){
-txtins<-paste0(io1$rename[io],".xpt")
-insert<-paste0("./datasets/",txtins)
-orf<-paste0("(original:",io1$filename[io],")")
-if(io==1){
-tt=pot(txtins,hyperlink= insert,
-         textBold( color = '#0000EE', underline = F ) )+"\n  "+pot(orf,textNormal())+"\n"
-   }else{
-tt =pot(txtins,hyperlink= insert,textBold( color = '#0000EE', underline = F ))+"\n  "+pot(orf,textNormal())
-   }}
+  zz0<-""
+  for(io in 1:nrow(io1)){
+    ext1<-ifelse(io1$type[io]=="prog",".txt",".xpt")
+    txtins<-paste0(io1$rename[io],ext1)
+    ext2<-ifelse(io1$type[io]=="prog","./programs/","./datasets/")
+    insert<-paste0(ext2,txtins)
+    orf<-paste0("(original:",io1$filename[io],")")
+    col='#0000EE'
+    space="\n  "
+    zz0<-zz0+pot(txtins,hyperlink=insert,textBold(color=col,underline = F ))+space+pot(orf,textNormal())+space}}
 
 if(nrow(io2)==0){
-tt1 =  pot("",textBold())
+  zz1 =  pot("",textBold())
 }else{
+zz1<-""
 for(io in 1:nrow(io2)){
-  txtins<-paste0(io2$rename[io],".xpt")
-  insert<-paste0("./datasets/",txtins)
+  ext1<-ifelse(io2$type[io]=="prog",".txt",".xpt")
+  txtins<-paste0(io2$rename[io],ext1)
+  ext2<-ifelse(io2$type[io]=="prog","./programs/","./datasets/")
+  insert<-paste0(ext2,txtins)
   orf<-paste0("(original:",io2$filename[io],")")
-  if(io==1){
-     tt1=pot(txtins,hyperlink= insert,textBold( color = '#0000EE', underline = F ) )+"\n  "+pot(orf,textNormal())+"\n"
-}else{
-tt1=pot(txtins,hyperlink= insert,textBold( color = '#0000EE', underline = F ) )+"\n  "+pot(orf,textNormal())}}}
+  col='#0000EE'
+  space="\n  "
+zz1<-zz1+pot(txtins,hyperlink=insert,textBold(color=col,underline = F ))+space+pot(orf,textNormal())+space}
+  }
 
 if(nrow(io3)==0){
-tt1 =  pot("",textBold())
+  zz2 =  pot("",textBold())
   }else{
+    zz2<-""
     for(io in 1:nrow(io3)){
-      txtins<-paste0(io3$rename[io],".txt")
-      insert<-paste0("./programs/",txtins)
+      ext1<-ifelse(io3$type[io]=="prog",".txt",".xpt")
+      txtins<-paste0(io3$rename[io],ext1)
+      ext2<-ifelse(io3$type[io]=="prog","./programs/","./datasets/")
+      insert<-paste0(ext2,txtins)
       orf<-paste0("(original:",io3$filename[io],")")
-      if(io==1){
-        tt2=pot(txtins,hyperlink= insert,textBold( color = '#0000EE', underline = F ) )+"\n  "+pot(orf,textNormal())+"\n"
-      }else{
-        tt2=pot(txtins,hyperlink= insert,textBold( color = '#0000EE', underline = F ) )+"\n  "+pot(orf,textNormal())}}}
+      col='#0000EE'
+      space="\n  "
+      zz2<-zz2+pot(txtins,hyperlink=insert,textBold(color=col,underline = F ))+space+pot(orf,textNormal())+space}
+  }
 
-  tab[i,3] =pot("Input",textBold())+"\n "+tt+"\n  "+pot("Output",textBold())+"\n  "+tt1+"\n  "+pot("Dependent",textBold())+"\n  "+tt2
-}}}else{
+  tab[i,3] =pot("Input",textBold())+"\n "+zz0+"\n  "+pot("Output",textBold())+"\n  "+zz1+"\n  "+pot("Dependent",textBold())+"\n  "+zz2
+}}else{
 if(length(dir(progdir))>=1&nrow(IOD)==0){
   tab3data<-data.frame(Original=origprog,
                        Program=prog,
@@ -844,11 +850,11 @@ step1<-function(working.folder){
       #xptconvert=c("1","1","1"),
       Program=c("NA","phxsetting",""),
       description=c("PK dataset","Posthoc","Phoenix settings")	,
-      sourcepath=c("copy/paste","path",""),
-      progNo=c("identify","main prog","ex. #1,#2"),
-      proNo.input=c("identify","associated file","ex.#1#2"),
-      proNo.output=c("identify","associated file","ex.#1#2"),
-      progNo.dependent=c("identify","associated file","ex.#1#2..NOTE:that these R functions should be included as program but do not assign any number in progNo"))
+      sourcepath=c("copy/paste path","",""),
+      progNo=c("unique number","ex.#1a",""),
+      proNo.input=c("could be multiple","#2b#3a",""),
+      proNo.output=c("could be multiple","#2b#3a",""),
+      progNo.dependent=c("could be multiple","#2b#3a","NOTE:that these R functions\n should be included as program\n but without progNo, i.e leave blank cell"))
     write.csv(lf,"list of files.csv")
   }}
 
