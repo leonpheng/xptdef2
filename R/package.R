@@ -697,7 +697,7 @@ if(nrow(io3)==0){
       zz2<-zz2+pot(txtins,hyperlink=insert,textBold(color=col,underline = F ))+space+pot(orf,textNormal())+space}
   }
 
-  tab[i,3] =pot("Input",textBold())+"\n "+zz0+"\n  "+pot("Output",textBold())+"\n  "+zz1+"\n  "+pot("Dependent",textBold())+"\n  "+zz2
+  tab[i,3] =pot("Input",textBold())+"\n "+zz0+"\n  "+pot("Output",textBold())+"\n  "+zz1+"\n  "+pot("Dependency",textBold())+"\n  "+zz2
 }}else{
 if(length(dir(progdir))>=1&nrow(IOD)==0){
   tab3data<-data.frame(Original=origprog,
