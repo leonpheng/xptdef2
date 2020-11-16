@@ -425,7 +425,7 @@ for (j in 1:nrow(inp)){
     detach("package:SASxport", unload = T)
 
     ind<-as.numeric(row.names(rangepkdat[rangepkdat$"Code/Range"=="-",]))
-    if(length(ind)>0){
+    if(length(ind[!is.na(ind)])>0){
       rgd<-rangepkdat
     for(i in 1:length(ind)){
         x<-ifelse(length(unique(data[,ind[i]]))>5,paste(paste(as.character(unique(data[,ind[i]])[1:5]),collapse=", ",sep=""),",..."),paste(as.character(unique(data[,ind[i]])),collapse=", ",sep=""))

@@ -1,4 +1,4 @@
 filename,type,rename,keyvar,Structure,Program,description,progNo,Software.version,Purpose,proNo.input,proNo.output,progNo.dependent,sourcepath
 ODON_POPPK_31OCT20.csv,dataset,pkdata,"optional ex:USUBJID,TIME",optional ex:per subject per time point,script or program name if applicable ex:phxsetting,Optional ex: PK dataset,,,,#1a,,,C:\Users\lpheng\Desktop\ODONAT
 cpt2.tab,dataset,patab,"optional ex:ID,TIME",optional ex:per subject per time point,script or program name if applicable ex:phxsetting,optional ex:Posthoc,,,,,#1a,,C:\Users\lpheng\Desktop\ODONAT\NONMEM
-cpt2.mod,prog,phxsetting,,,,optional ex:Phoenix settings, #1a,for PMDA filing ex:NONMEM VERSION 7.4.3,for PMDA filing ex:NONMEM control stream of population PK base model,,,,C:\Users\lpheng\Desktop\ODONAT\NONMEM
+cpt2.mod,program,modcpt2,,,,optional ex:Phoenix settings,#1a,for PMDA filing ex:NONMEM VERSION 7.4.3,for PMDA filing ex:NONMEM control stream of population PK base model,,,,C:\Users\lpheng\Desktop\ODONAT\NONMEM
