@@ -1,5 +1,4 @@
 "SAS Variable","SAS Label","Type","Code/Range","Unit","Detailed.description"
-"ID","X.ID","Num","1 - 273",NA,"X.ID"
 "DV","Dependent variable","Num","0 - 447",NA,"Dependent variable"
 "LNDV","LNDV","Num","-999 - 6.10256",NA,"LNDV"
 "AMT","Amount administer","Num","2 - 90",NA,"Amount administer"

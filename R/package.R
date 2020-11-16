@@ -630,8 +630,7 @@ op<-paste0("./programs/",prog[i])
 #textBold( color = '#0000EE', underline = F ) )+ " \n(original:" +pot(origprog[i])+")"
 
 tab[i,1] = pot(prog[i])+ "\n(original:" +pot(origprog[i])+")"
-tab[i,2] = pot("Software used: ",textBold())+ software.used[i]+space+
-          pot("Purpose: ",textBold())+progdes[i]
+tab[i,2] = pot("Software used: ",textBold())+ software.used[i]+space+pot("Purpose: ",textBold())+progdes[i]
 
 
 
