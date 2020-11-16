@@ -182,7 +182,7 @@ importfiles<-function(...){
   lst<- read.csv("list of files.csv")
   lst$type1<-"nonmem"
   lst$type1[grep(".csv",lst$filename)]<-"csv"
-  lst$type1[lst$type=="program"]<-"txt"
+  lst$type1[lst$type!="dataset"]<-"txt"
   lst$extension=".csv"
   lst$extension[lst$type!="dataset"]<-".txt"
   conv<-with(lst,paste0(rename,extension))
@@ -280,6 +280,7 @@ lib1$labelsize<-nchar(as.character(lib1$"Variable"))
   }else{print("Everything look fine, please fill out studydefinelist.csv, have it QCd and run step4. Step4: add title to define document ex: step4(title=title)")}
 
 write.csv(nodup(lib1[,keep],c("Variable","file"),"all"),paste(pathwork,"studydefinelist.csv",sep="/"),row.names=F)
+
 }
 
 #' Update library
@@ -829,21 +830,20 @@ step1<-function(working.folder){
   setwd(working.folder)
   if(!"list of files.csv"%in%dir()){
     lf<-data.frame(
-      filename=c("data.csv","nonmem dataset","txt"),
+      filename=c("data.csv","nonmem","txt"),
       type=c("dataset","dataset","prog"),
-      extension=c("csv","","txt"),
       rename=c("pkdata","patab","phxsetting"),
       keyvar=c("optional ex:USUBJID,TIME","optional ex:ID,TIME",""),
       Structure=c("optional ex:per subject per time point","optional ex:per subject per time point",""),
       Program=c("script or program name if applicable ex:phxsetting","script or program name if applicable ex:phxsetting",""),
-      description=c("Optional ex: PK dataset","optional ex:Posthoc","optional ex:Phoenix settings")	,
-      progNo=c("for PMDA filing","label programs ex: #1a",""),
-      Software.version=c("for PMDA filing","ex:NONMEM VERSION 7.4.3",""),
-      Purpose=c("for PMDA filing","ex:NONMEM control stream of population PK base model",""),
-      proNo.input=c("for PMDA","map input file or dataset for ex: #1a",""),
-      proNo.output=c("for PMDA","map output file or dataset for ex: #1a",""),
-      progNo.dependent=c("for PMDA","map dependency file for ex:#1a",""),
-      sourcepath=c("copy/paste the source path from File explorer","",""))
+      description=c("Optional ex: PK dataset","optional ex:Posthoc","optional ex:Phoenix settings"),
+      progNo=c("","","for PMDA filing label programs ex: #1a"),
+      Software.version=c("","","for PMDA filing ex:NONMEM VERSION 7.4.3"),
+      Purpose=c("","","for PMDA filing ex:NONMEM control stream of population PK base model"),
+      proNo.input=c("","","for PMDA filing map input file or dataset for ex: #1a"),
+      proNo.output=c("","","for PMDA map output file or dataset for ex: #1a"),
+      progNo.dependent=c("","","for PMDA map dependency file for ex:#1a"),
+      sourcepath=c("","","copy/paste the source path from File explorer"))
     write.csv(lf,"list of files.csv",row.names =F)
   }}
 
