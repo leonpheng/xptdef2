@@ -917,10 +917,9 @@ step3<-function(){
 #' @examples
 #' step4(title="Add title here")
 step4<-function(title="Title"){
-  create.library(name="library.csv")
   class="auto"
   generateXPT(range.character="no")
-  generateDEF1(title=title)
+  generateDEF1(title)
   cleardefCSV1()
 }
 
