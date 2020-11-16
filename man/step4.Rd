@@ -4,16 +4,16 @@
 \alias{step4}
 \title{Step 4}
 \usage{
-step4(title = "Title")
+step4(project_title = "Project Title", range_character = "yes")
 }
 \arguments{
-\item{title}{Project title}
-
 \item{logo}{Add logo by copying logo.jpg to the main working folderfirst time package user, run this function to install all required packages.
 Can be downloaded from my Github}
 
 \item{style}{Load document style by copying word template and rename as style.docx to the main working folder.
 Can be downloaded from my Github}
+
+\item{title}{Project title}
 }
 \description{
 Convert csv to xpt and create define document

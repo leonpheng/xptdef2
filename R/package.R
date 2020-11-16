@@ -330,7 +330,8 @@ generateXPT<-function(range.character=NULL){
 
   checkclass=class#NULL or "auto"
 
-  lst<- read.csv(paste(pathwork,"list of files.csv",sep="/"))
+  lst<- read.csv(paste(pathwork,"list of files.csv",sep="/"),stringsAsFactors=F)
+  lst$type[lst$type!="dataset"]<-"program"
   #lst<-lst[lst$xptconvert==1,]
   head(lst)
   csv<-lst[lst$type=="dataset",]
@@ -340,8 +341,8 @@ generateXPT<-function(range.character=NULL){
   key<-unlist(paste0(csv$keyvar))
 
   ##PROGRAMS TABLE
-  prog<-unlist(paste0(lst$renam[lst$type=="prog"],".txt"))
-  progdes<-unlist(paste0(lst$renam[lst$description=="prog"]))
+  prog<-unlist(paste0(lst$renam[lst$type=="program"],".txt"))
+  progdes<-unlist(paste0(lst$renam[lst$description=="program"]))
   ####### NOT TO BE EDITED ##################################
   location<-paste0("#programs#",prog)
   ###############################
@@ -466,7 +467,10 @@ generateDEF1<-function(title="Add title here"){
   outputdir<-paste0(pathdir,"/output/datasets") # This folder for resulted output
   #setwd(outputdir)
   #lst<- read.xls(paste(pathwork,"list of files.xlsx",sep="/"), sheet = 1)
-  lst<- read.csv(paste(pathwork,"list of files.csv",sep="/"))
+  lst<- read.csv(paste(pathwork,"list of files.csv",sep="/"),stringsAsFactors=F)
+  head(lst)
+  lst$type[lst$type!="dataset"]<-"program"
+
   #lst<-lst[lst$xptconvert==1,]
 
   csv<-lst[lst$type=="dataset",]
@@ -615,10 +619,10 @@ origprog<-unlist(paste0(lst$filename [lst$type!="dataset"]))
   prono<-lst[rownames(lst)%in%rownames(IOD),"progNo"]
 
 if(nrow(IOD)>0){
-    prog<-unlist(paste0(ind$renam[ind$type=="program"],".txt"))
-    progdes<-unlist(paste0(ind$Purpose[ind$type=="program"]))
-    origprog<-unlist(paste0(ind$filename[ind$type=="program"]))
-    software.used<-unlist(paste0(ind$Software.version[ind$type=="program"]))
+    prog<-unlist(paste0(ind$renam[ind$type!="dataset"],".txt"))
+    progdes<-unlist(paste0(ind$Purpose[ind$type!="dataset"]))
+    origprog<-unlist(paste0(ind$filename[ind$type!="dataset"]))
+    software.used<-unlist(paste0(ind$Software.version[ind$type!="dataset"]))
 
 tab3data<-data.frame(Program_Original_names="",
                          Description="",
@@ -644,9 +648,9 @@ tt =  pot("",textBold())
 }else{
   zz0<-""
   for(io in 1:nrow(io1)){
-    ext1<-ifelse(io1$type[io]=="prog",".txt",".xpt")
+    ext1<-ifelse(io1$type[io]=="program",".txt",".xpt")
     txtins<-paste0(io1$rename[io],ext1)
-    ext2<-ifelse(io1$type[io]=="prog","./programs/","./datasets/")
+    ext2<-ifelse(io1$type[io]=="program","./programs/","./datasets/")
     insert<-paste0(ext2,txtins)
     orf<-paste0("(original:",io1$filename[io],")")
     col='#0000EE'
@@ -659,9 +663,9 @@ if(nrow(io2)==0){
 }else{
 zz1<-""
 for(io in 1:nrow(io2)){
-  ext1<-ifelse(io2$type[io]=="prog",".txt",".xpt")
+  ext1<-ifelse(io2$type[io]=="program",".txt",".xpt")
   txtins<-paste0(io2$rename[io],ext1)
-  ext2<-ifelse(io2$type[io]=="prog","./programs/","./datasets/")
+  ext2<-ifelse(io2$type[io]=="program","./programs/","./datasets/")
   insert<-paste0(ext2,txtins)
   orf<-paste0("(original:",io2$filename[io],")")
   col='#0000EE'
@@ -675,9 +679,9 @@ if(nrow(io3)==0){
   }else{
     zz2<-""
     for(io in 1:nrow(io3)){
-      ext1<-ifelse(io3$type[io]=="prog",".txt",".xpt")
+      ext1<-ifelse(io3$type[io]=="program",".txt",".xpt")
       txtins<-paste0(io3$rename[io],ext1)
-      ext2<-ifelse(io3$type[io]=="prog","./programs/","./datasets/")
+      ext2<-ifelse(io3$type[io]=="program","./programs/","./datasets/")
       insert<-paste0(ext2,txtins)
       orf<-paste0("(original:",io3$filename[io],")")
       col='#0000EE'
@@ -915,10 +919,10 @@ step3<-function(){
 #' @export
 #' @examples
 #' step4(title="Add title here")
-step4<-function(title="Title"){
+step4<-function(project_title="Project Title",range_character="yes"){
   class="auto"
-  generateXPT(range.character="no")
-  generateDEF1(title)
+  generateXPT(range.character=range_character)
+  generateDEF1(title=project_title)
   cleardefCSV1()
 }
 
