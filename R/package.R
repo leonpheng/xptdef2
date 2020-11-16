@@ -617,7 +617,7 @@ if(nrow(IOD)>0){
     prog<-unlist(paste0(ind$renam[ind$type=="program"],".txt"))
     progdes<-unlist(paste0(ind$Purpose[ind$type=="program"]))
     origprog<-unlist(paste0(ind$filename[ind$type=="program"]))
-    software.used<-unlist(paste0(ind$software.used[ind$type=="program"]))
+    software.used<-unlist(paste0(ind$Software.version[ind$type=="program"]))
 
 tab3data<-data.frame(Program_Original_names="",
                          Description="",
@@ -838,7 +838,7 @@ step1<-function(working.folder){
       Program=c("script or program name if applicable ex:phxsetting","script or program name if applicable ex:phxsetting",""),
       description=c("Optional ex: PK dataset","optional ex:Posthoc","optional ex:Phoenix settings")	,
       progNo=c("for PMDA filing","label programs ex: #1a",""),
-      software.used=c("for PMDA filing","ex:NONMEM VERSION 7.4.3",""),
+      Software.version=c("for PMDA filing","ex:NONMEM VERSION 7.4.3",""),
       Purpose=c("for PMDA filing","ex:NONMEM control stream of population PK base model",""),
       proNo.input=c("for PMDA","map input file or dataset for ex: #1a",""),
       proNo.output=c("for PMDA","map output file or dataset for ex: #1a",""),

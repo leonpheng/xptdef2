@@ -1,4 +1,0 @@
-filename,type,rename,keyvar,Structure,Program,description,progNo,proNo.input,proNo.output,progNo.dependent,sourcepath
-ODON_POPPK_31OCT20.csv,dataset,pkdata,"optional ex:USUBJID,TIME",per subject per time point,,Optional ex: PK dataset,,#1a,,,C:\Users\lpheng\Desktop\ODONAT
-cpt2.tab,dataset,patab,"optional ex:ID,TIME",per subject per time point,modcpt2,NONMEM output for base model,,,#1a,,C:\Users\lpheng\Desktop\ODONAT\NONMEM
-cpt2.mod,program,modcpt2,,,,Phoenix settings,#1a,,,,C:\Users\lpheng\Desktop\ODONAT\NONMEM
