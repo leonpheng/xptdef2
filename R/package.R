@@ -602,7 +602,7 @@ tabn<-c("Dataset", "Original Name",   "Description",     "Key Variables",    "Lo
 ##PROGRAMS TABLE
 prog<-unlist(paste0(lst$renam[lst$type=="program"],".txt"))
 progdes<-unlist(paste0(lst$description[lst$type=="program"]))
-origprog<-unlist(paste0(lst$filename [lst$type=="program"]))
+origprog<-unlist(paste0(lst$filename [lst$type!="dataset"]))
 
 ####### NOT TO BE EDITED ##################################
   location<-paste0("#programs#",prog)
