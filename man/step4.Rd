@@ -4,7 +4,13 @@
 \alias{step4}
 \title{Step 4}
 \usage{
-step4(project_title = "Project Title", range_character = "yes")
+step4(
+  project_title = "Project Title",
+  xpt_location = "./",
+  prog_location = "../programs/",
+  define_location = "./output/datasets/",
+  range_character = "yes"
+)
 }
 \arguments{
 \item{logo}{Add logo by copying logo.jpg to the main working folderfirst time package user, run this function to install all required packages.

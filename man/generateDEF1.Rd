@@ -4,7 +4,12 @@
 \alias{generateDEF1}
 \title{generateDEF1}
 \usage{
-generateDEF1(title = "Add title here")
+generateDEF1(
+  title = "Add title here",
+  xpt.location = "./",
+  prog.location = "../programs/",
+  define.location = "./output/datasets/"
+)
 }
 \description{
 internal used function.

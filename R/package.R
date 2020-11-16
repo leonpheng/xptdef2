@@ -293,13 +293,20 @@ write.csv(nodup(lib1[,keep],c("Variable","file"),"all"),paste(pathwork,"studydef
 #' create.library()
 
 lib.update<-function(prevlib="//certara.com/sites/S02-Cary/Consulting/Projects/ras/Nath team/library/xptlibrary.csv",newlib="studydefinelist.csv"){
+  keep<-c("Variable","Unit","Detailed.description","Enter.label.here")
+  if(!is.null(prevlib)){
   pl<-read.csv(prevlib)
   lib<-read.csv(newlib)
-  intersect(names(pl),names(lib))
   pl1<-rbind(pl[,intersect(names(pl),names(lib))],lib[,intersect(names(pl),names(lib))])
   pl1<-pl1[!duplicated(pl1$Variable),]
   write.csv(pl1,prevlib)
   write.csv(pl1,paste0(prevlib,"_",Sys.Date(),".csv"))
+  }else{
+    pl1<-read.csv(newlib)[,keep]
+    pl1<-pl1[!duplicated(pl1$Variable),]
+    write.csv(pl1,"xptlibrary.csv")
+    write.csv(pl1,paste0("xptlibrary.csv","_",Sys.Date(),".csv"))
+    }
   }
 
 
@@ -458,7 +465,7 @@ for (j in 1:nrow(inp)){
 #' @examples
 #' generateDEF1()
 
-generateDEF1<-function(title="Add title here"){
+generateDEF1<-function(title="Add title here",xpt.location="./",prog.location="../programs/",define.location="./output/datasets/"){
   setwd(working.folder)
   pathwork<-getwd()
   pathdir<-pathwork
@@ -525,7 +532,7 @@ generateDEF1<-function(title="Add title here"){
                          font.weight = "bold", font.style = "normal", underlined = FALSE,
                          font.family = getOption("ReporteRs-default-font")
   )
-  if("style.docx"%in%dir("c:/lhtemplate")){
+if("style.docx"%in%dir("c:/lhtemplate")){
     doc<-docx(template = "c:/lhtemplate/style.docx", empty_template = TRUE)
     doc = map_title(doc, stylenames = c("Heading1", "Heading2", "Heading3") )
   }else{doc<-docx()}
@@ -541,7 +548,9 @@ tabn<-c("Dataset", "Original Name",   "Description",     "Key Variables",    "Lo
 
   hyp1<-paste0(sub(".csv","",outdir),".xpt")
   for(i in 1:length(hyp1)){
-    hyp11<-paste0("./datasets/",hyp1[i])
+    loc1<-paste0(xpt.location,hyp1[i])
+    hyp11<-gsub(loc,"./",loc1)
+    #hyp11<-paste0("./datasets/",hyp1[i])
     tab[i,5] = pot( hyp0[i], hyperlink = hyp11,
                     textBold( color = '#0000EE', underline = F ) ) }
 
@@ -587,14 +596,14 @@ tabn<-c("Dataset", "Original Name",   "Description",     "Key Variables",    "Lo
     tab[2,1, text.properties = textNormal(color = 'black')] =as.character(inp1$Original.Name[j])
     tab[3,1, text.properties = textNormal(color = 'black')] =as.character(struct[j])
     hyp2<- as.character(inp1$Dataset[j])
-    hyp11<-paste0("./datasets/",as.character(inp1$Dataset[j]))
+    hyp11<-paste0(xpt.location,as.character(inp1$Dataset[j]))
     tab[4,1] = pot(hyp2, hyperlink = hyp11,
                    textBold( color = '#0000EE', underline = F ) )
     #as.character(inp1$Dataset[j])
     if(usedprog[j]=="NA"){
       tab[5,1] =as.character(usedprog[j])}else{
         hyp2<- as.character(paste0(usedprog[j],".txt"))
-        hyp11<-paste0("./programs/",hyp2)
+        hyp11<-paste0(prog.location,hyp2)
         tab[5,1] = pot(hyp2, hyperlink = hyp11,
          textBold( color = '#0000EE', underline = F ) )}
     border_ <- borderProperties( style = 'none' )
@@ -706,7 +715,7 @@ if(length(dir(progdir))>=1&nrow(IOD)==0){
 
 if(nrow(IOD)==0){
 orig<-origprog
-hyp0<-paste0("#program#",tab3data[,"Program"])
+hyp0<-paste0("#programs#",tab3data[,"Program"])
 hyp1<-tab3data
 hyp2<-hyp1[,"Location"]
 hyp1[,"Location"]<-""
@@ -714,13 +723,13 @@ tab = FlexTable(data = hyp1[1:nrow(hyp1),], header.columns= FALSE)
   tab = addHeaderRow(tab, text.properties = textBold(),
                       value = as.character(names(tab3data)))
 for(i in 1:length(hyp0)){
-    hyp11<-paste0("./programs/",hyp0[i])
-    tab[i,4] = pot(hyp0[i],hyperlink = hyp11,
+  hyp11<-paste0(prog.location,hyp1[,"Program"][i])
+  tab[i,4] = pot(hyp0[i],hyperlink = hyp11,
                    textBold( color = '#0000EE', underline = F ) ) }}
 
 
-  doc <- addFlexTable(doc,tab)
-  writeDoc(doc, file = "./output/define.docx")
+doc <- addFlexTable(doc,tab)
+writeDoc(doc,paste0(define.location,"define.docx"))
 }
 
 #' clearALL
@@ -920,10 +929,11 @@ step3<-function(){
 #' @export
 #' @examples
 #' step4(title="Add title here")
-step4<-function(project_title="Project Title",range_character="yes"){
+step4<-function(project_title="Project Title",xpt_location="./",prog_location="../programs/",define_location="./output/datasets/",
+                range_character="yes"){
   class="auto"
   generateXPT(range.character=range_character)
-  generateDEF1(title=project_title)
+  generateDEF1(title=project_title,xpt.location=xpt_location,prog.location=prog_location,define.location=define_location)
   cleardefCSV1()
 }
 
