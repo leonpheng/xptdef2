@@ -19,30 +19,19 @@ ipak <- function(pkg){
   sapply(pkg, require, character.only = TRUE)
 }
 
-#' Install Package (First Installation)
+#' Install Packages (First Installation)
 #'
 #' To install required packages. Use ipak function to install desired packages.
 #' @param packages pre-define packages list.
 #' @keywords install.pack
 #' @export
 #' @examples
-#' install.pack()
+#' install.packages()
 
-install.pack<-function(...){
+install.packages<-function(...){
   packages <- c("SASxport", "reshape", "Hmisc", "tidyr","ReporteRs","plyr","downloader")
-  ipak(packages)}
+  ipak(packages)
 
-
-#' Download Template Logo in C drive
-#'
-#' To install require packages. Use ipak function to install desired packages.
-#' @param repo leonpheng
-#' @param user logo.style
-#' @keywords template
-#' @export
-#' @examples
-#' template()
-template <- function(){
   require(downloader)
   dir.create("c:/lhtemplate")
   wf<-"c:/lhtemplate"
@@ -56,6 +45,9 @@ template <- function(){
   unzip(zipF,exdir=wf)
   zipF<-paste0(wf,"/logo.style-master/logostyle.zip")
   unzip(zipF,exdir=wf)
+  zipF<-paste0(wf,"/logo.style-master/PCSmisc_0.9.2.zip")
+  dir.create("c:/lhtemplate/package")
+  file.copy(zipF, "c:/lhtemplate/package")
   frm<-dir(wf)
   index<-c(grep("zip",frm))
   frm<-frm[index]
@@ -63,7 +55,8 @@ template <- function(){
     file.remove(paste(wf,i,sep="/"))
   }
   unlink(paste0(wf,"/logo.style-master"), recursive = T)
-}
+
+  }
 
 
 #Load needed packages: Install if not available
@@ -175,7 +168,7 @@ importfiles<-function(...){
   #lst<- read.xls(paste(pathwork,"list of files.xlsx",sep="/"), sheet = 1)
   setwd(working.folder)
   mainDir<-getwd()
-  subDir<-c("input","output","Backup csv")
+  subDir<-c("input","output","Backup")
 
   for(i in 1:length(subDir)){
     dir.create(file.path(mainDir, subDir[i]), showWarnings = FALSE)
@@ -187,28 +180,30 @@ importfiles<-function(...){
   }
   dir()
   lst<- read.csv("list of files.csv")
+  lst$type1<-"nonmem"
+  lst$type1[grep(".csv",lst$filename)]<-"csv"
+  lst$type1[lst$type=="program"]<-"txt"
+  lst$extension=".csv"
+  lst$extension[lst$type!="dataset"]<-".txt"
+  conv<-with(lst,paste0(rename,extension))
   #lst<-lst[lst$xptconvert==1,]
   for(i in 1:nrow(lst)){
     odir1<-paste0(getwd(),"/input/")
     odir2<-as.character(paste0(getwd(),"/output/programs/"))
     sour<-as.character(paste0(lst$sourcepath[i],"\\",lst$filename[i]))
-    conv<-with(lst,paste0(rename[i],".",extension[i]))
-
-    if(lst$type[i]=="data"){
-      #dat <-read.csv(sour)
-      #write.csv(dat,paste0(odir1,conv),row.names=F)
+    if(lst$type[i]=="dataset"&lst$type1[i]!="nonmem"){
       file.copy(from=sour,
-               to=paste0(odir1,conv),overwrite=T)
+               to=paste0(odir1,conv[i]),overwrite=T)
     }else{
-      if(!lst$type[i]%in%c("data","prog")){
-        dat <-read.nonmem.table(paste0(sour))
-        write.csv(dat,paste0(odir1,conv),row.names=F)
+      if(lst$type1[i]=="nonmem"){
+        dat <-PCSmisc::read.nonmem.table(paste0(sour))
+        write.csv(dat,paste0(odir1,conv[i]),row.names=F)
       }else{
-        if(lst$type[i]%in%c("prog")){
-        file.copy(from=sour,
-                  to=paste0(odir2,conv),overwrite=T)
+        if(tolower(lst$type[i])%in%c("program","prog")){
+        file.copy(from=sour,to=paste0(odir2,conv[i]),overwrite=T)
       }}
     }
+
   }}
 
 
@@ -230,89 +225,80 @@ definelist<-function(...){
     var1<-data.frame(orivar=unlist(names(read.csv(paste0(odir1,i)))),file=i)
     var<-rbind(var,var1)
   }
-  #lib<-read.xls(paste(pathwork,"label library.xls",sep="/"), sheet = 1)
-  if(define.library!="no"){
-    lib<-read.csv(paste(pathwork,define.library,sep="/"))}else{
-      lib<-as.data.frame(matrix(ncol=7,nrow=1))
-      names(lib)<-c("Variable","Unit","Detailed.description", "Enter.label.here",
-                    "Max.40.char","Enter.label.here.1","Numflg")
-    }
-  row.names(lib)<-NULL
-  lib$X<-NULL
-  keep<-names(lib)
-  lib$tmp<-toupper(lib$Variable)
-  lib$Variable<-NULL
-  var$tmp<-toupper(var$orivar)
-  lib1<-plyr::join(var,lib)
 
-  lib1$Variable<-lib1$orivar
-  lib1$tmp<-NULL
+  if(define.library!="no"){
+    lib<-read.csv(define.library)
+    var[,1]<-tolower(var[,1]);lib[,1]<-tolower(lib[,1])
+    names(var)[1]<-"Variable"
+    var<-dplyr::left_join(var,lib)
+    head(var)
+    lib<-with(var,data.frame(
+      Variable=Variable,
+      Unit="",
+      Detailed.description=Detailed.description,
+      Enter.label.here=Enter.label.here,
+      Max.40.char=nchar(as.character(Enter.label.here)),
+      file=file))
+  }else{
+    lib<-with(var,data.frame(
+      Variable=orivar,
+      Unit="",
+      Detailed.description="",
+      Enter.label.here="",
+      Max.40.char="USE FUNCTION LEN()",
+      file=file))
+    }
+
+  keep<-names(lib)
+
+  lib1<-lib#plyr::join(var,lib)
   lib1$"SAS.label"<-lib1$"Enter.label.here"
   lib1$"Max.40.char"<-nchar(as.character(lib1$"SAS.label"))
+lib1$labelsize<-nchar(as.character(lib1$"Variable"))
 
-  lib1$file<-lib1$file
-  lib1$labelsize<-nchar(as.character(lib1$"Variable"))
-
-  #if(is.null(lib1$"to.remove.type.1")){
-  #  lib1$"to.remove.type.1"<-0
-  #}
   keep<-c("Variable","Unit","Detailed.description","Enter.label.here","Max.40.char","file")
 
-  #lib1$Numflg<-1
   lib1$Variable<-toupper(lib1$Variable)
-  lib1$orivar<-toupper(lib1$orivar)
-  lib1<-nodup(lib1,names(lib1),"all")
-  lib1[,setdiff(keep,names(lib1))]<-NA
-  lib1<-lib1[,c(keep)]
 
   lib2<-lib1[nchar(lib1$Variable)>8,]
   lib3<- lib1[grepl(".", lib1$Variable,
                     fixed = T),]
   if(nrow(lib2)>=1|nrow(lib3)>=1){
     lib2<-rbind(lib2,lib3)
-    lib2$change.name<-"Enter new name"
+    lib2$change.name<-""
     lib2<-nodup(lib2,names(lib2),"all")
-    write.csv(lib2,paste(pathwork,"Var_name_GT8.csv",sep="/"),row.names=F)
-    print("WRANING!!")
-    print("!!Variable with name longer than 8 characters or containing dot (.) were found !!")
+    write.csv(lib2[,c("Variable","file","labelsize","change.name")],paste(pathwork,"Var_name_GT8.csv",sep="/"),row.names=F)
+    print("WARNING because:")
+    print("1) Variable name is longer than 8 characters")
+    print("2) Variable name contains dot (.) ")
     print("Solution:")
     print("1) Complete studydefinelist.csv")
-    print("2) Rename the variable in Var_name_GT8.csv")
-    print("3) Run Change.variable.name () function to apply the change")
-  }
-  write.csv(lib1,paste(pathwork,"studydefinelist.csv",sep="/"),row.names=F)
+    print("2) Open Var_name_GT8.csv and rename the variable in column change.name")
+    print("3) Save Var_name_GT8.csv and run step3() to apply the change")
+    print("4) Note that step3() is optional thus you can change variable name manually in the source and in the studydefinelist.csv and run step4()")
+    print("5) Note also that SASexport will trim the variable name to 8 characters but this may cause duplicated name in the output")
+  }else{print("Everything look fine, please fill out studydefinelist.csv, have it QCd and run step4. Step4: add title to define document ex: step4(title=title)")}
+
+write.csv(nodup(lib1[,keep],c("Variable","file"),"all"),paste(pathwork,"studydefinelist.csv",sep="/"),row.names=F)
 }
 
-
-#' create.library
+#' Update library
 #'
-#' internal used function.
+#' Optional used function.
 #'
 #' @keywords definelist
 #' @export
 #' @examples
 #' create.library()
 
-create.library<-function(name){
-  lib<-read.csv("studydefinelist.csv")
-  filename = paste("./Backup csv/modified deflist-",format(Sys.time(), "%a-%b-%d-%H-%M-%S-%Y"),sep="")
-  write.csv(lib,paste0(filename,".csv"))
-  lib2<-with(lib,data.frame(
-    Variable=Variable,
-    Unit=Unit,
-    Detailed.description=Detailed.description,
-    Enter.label.here=Enter.label.here,
-    Max.40.char=Max.40.char,
-    SAS.label=Enter.label.here#,
-    #Numflg=Numflg
-    ))
-  lib2<-nodup(lib2,"Variable","all")
-  lib2$Max.40.char<-nchar(as.character(lib2$SAS.label))
-  lib2<-lib2[!is.na(lib2$SAS.label),]
-  # write.csv(lib2,name,row.names=F)
-}
-
-
+lib.update<-function(prevlib="C:/lhtemplate/xptlibrary.csv",newlib="studydefinelist.csv"){
+  pl<-read.csv(prevlib)
+  lib<-read.csv(newlib)
+  intersect(names(pl),names(lib))
+  pl1<-rbind(pl[,intersect(names(pl),names(lib))],lib[,intersect(names(pl),names(lib))])
+  pl1<-pl1[!duplicated(pl1$Variable),]
+  write.csv(pl1,prevlib)
+  }
 
 
 #####
@@ -336,21 +322,17 @@ generateXPT<-function(range.character=NULL){
   pathwork<-getwd()
   pathdir<-pathwork
   load.pack1()
-  #sourcepath<-paste0(pathdir,"/functions") #This folder should contain sources (html export.R and label fun.R), libray excel fil (ex: label libraryAUSPECT.xls)
-  #input<-paste0(pathdir,"/input")# This folder should contain all csv data
+
   input<-paste0(pathwork,"/input")
   progdir <- "./output/programs"# This folder should contain all program and output .txt
   outputdir<-paste0(pathdir,"/output/datasets") # This folder for resluted output
-  #setwd(sourcepath)
-  #source(file.path(sourcepath,"html export.R"))
-  #source(file.path(sourcepath,"label fun.R"))
+
   checkclass=class#NULL or "auto"
-  #setwd(input)
-  #lst<- read.xls(paste(pathwork,"list of files.xlsx",sep="/"), sheet = 1)
+
   lst<- read.csv(paste(pathwork,"list of files.csv",sep="/"))
   #lst<-lst[lst$xptconvert==1,]
   head(lst)
-  csv<-lst[lst$extension=="csv",]
+  csv<-lst[lst$type=="dataset",]
   dir<-unlist(paste0(csv$rename,".csv"))
   oriname<-unlist(paste0(csv$filename))
   description<-unlist(paste0(csv$description))
@@ -391,7 +373,7 @@ generateXPT<-function(range.character=NULL){
   detail$Enter.label.here<-capitalize(as.character(detail$Enter.label.here))
   detail$SAS.label<-capitalize(as.character(detail$Enter.label.here))
   ################## START LOOP #################
-  for (j in 1:nrow(inp)){
+for (j in 1:nrow(inp)){
     require(SASxport)
     #numkeep<-detail$Variable[detail$Numflg==1]
     detail<- read.csv(paste(pathwork,definelib,sep="/"))
@@ -403,11 +385,10 @@ generateXPT<-function(range.character=NULL){
     pkdata<-chclass(pkdata,names(pkdata),"char")
     names(pkdata)<-toupper(names(pkdata))
     pkdata<-chclass(pkdata,names(pkdata),"char")
-    #keepnum<-intersect(names(pkdata),numkeep)
+
     if(!is.null(checkclass)){
       pkdata<-autoclass(pkdata)
     }
-    #else{pkdata<-chclass(pkdata,keepnum,"num")}
 
     for (h in 1:nrow(detail)){
       tryCatch(label(pkdata[,paste(detail$Variable[h])])<- paste(detail$SAS.label[h]),error=function(e) NULL )
@@ -443,7 +424,7 @@ generateXPT<-function(range.character=NULL){
     ind<-as.numeric(row.names(rangepkdat[rangepkdat$"Code/Range"=="-",]))
     if(length(ind)>0){
       rgd<-rangepkdat
-      for(i in 1:length(ind)){
+    for(i in 1:length(ind)){
         x<-ifelse(length(unique(data[,ind[i]]))>5,paste(paste(as.character(unique(data[,ind[i]])[1:5]),collapse=", ",sep=""),",..."),paste(as.character(unique(data[,ind[i]])),collapse=", ",sep=""))
         rgd[ind[i],"Code/Range"]<-x}}else{rgd<-rangepkdat}
     if(!is.null(range.character)){
@@ -483,12 +464,11 @@ generateDEF1<-function(title="Add title here"){
   progdir <- paste0(pathdir,"/output/programs")# This folder should contain all program and output .txt
   outputdir<-paste0(pathdir,"/output/datasets") # This folder for resulted output
   #setwd(outputdir)
-  dir()
   #lst<- read.xls(paste(pathwork,"list of files.xlsx",sep="/"), sheet = 1)
   lst<- read.csv(paste(pathwork,"list of files.csv",sep="/"))
   #lst<-lst[lst$xptconvert==1,]
 
-  csv<-lst[lst$extension=="csv",]
+  csv<-lst[lst$type=="dataset",]
   dir<-unlist(paste0(csv$rename,".csv"))
   oriname<-unlist(paste0(csv$filename))
   description<-unlist(paste0(csv$description))
@@ -538,7 +518,6 @@ generateDEF1<-function(title="Add title here"){
   style1<-textProperties(color = "black", font.size =12,
                          font.weight = "bold", font.style = "normal", underlined = FALSE,
                          font.family = getOption("ReporteRs-default-font")
-
   )
   if("style.docx"%in%dir("c:/lhtemplate")){
     doc<-docx(template = "c:/lhtemplate/style.docx", empty_template = TRUE)
@@ -546,7 +525,7 @@ generateDEF1<-function(title="Add title here"){
   }else{doc<-docx()}
 
 tabn<-c("Dataset", "Original Name",   "Description",     "Key Variables",    "Location")#as.character(names(inp1[1:nrow(inp1),]))
-  #HYPERLINK1
+#HYPERLINK1
   hyp0<-inp1[,"Datasetfullname"]
   inp1[,"Datasetfullname"]<-""
   tab = FlexTable( data = inp1[1:nrow(inp1),], header.columns= FALSE)
@@ -620,41 +599,48 @@ tabn<-c("Dataset", "Original Name",   "Description",     "Key Variables",    "Lo
 
 ##Tab 3
 ##PROGRAMS TABLE
-prog<-unlist(paste0(lst$renam[lst$type=="prog"],".txt"))
-progdes<-unlist(paste0(lst$description[lst$type=="prog"]))
-origprog<-unlist(paste0(lst$filename [lst$type=="prog"]))
+prog<-unlist(paste0(lst$renam[lst$type=="program"],".txt"))
+progdes<-unlist(paste0(lst$description[lst$type=="program"]))
+origprog<-unlist(paste0(lst$filename [lst$type=="program"]))
 
 ####### NOT TO BE EDITED ##################################
   location<-paste0("#programs#",prog)
   doc<-addTitle(doc, "PROGRAMS TABLE OF CONTENTS",level=1)
   dir(progdir)
 
-  include<-paste0(lst$rename[lst$progNo!=""],".txt")
-  IOD<-lst[lst$progNo%in%lst$progNo[lst$progNo!=""]&!is.na(lst$progNo),]
+  include<-paste0(lst$rename[lst$progNo!=""&!is.na(lst$progNo)],".txt")
+  IOD<-lst[lst$progNo%in%lst$progNo[lst$progNo!=""&!is.na(lst$progNo)]&!is.na(lst$progNo),]
   ind<-lst[rownames(lst)%in%rownames(IOD),]
   prono<-lst[rownames(lst)%in%rownames(IOD),"progNo"]
 
 if(nrow(IOD)>0){
-    prog<-unlist(paste0(ind$renam[ind$type=="prog"],".txt"))
-    progdes<-unlist(paste0(ind$description[ind$type=="prog"]))
-    origprog<-unlist(paste0(ind$filename[ind$type=="prog"]))
+    prog<-unlist(paste0(ind$renam[ind$type=="program"],".txt"))
+    progdes<-unlist(paste0(ind$Purpose[ind$type=="program"]))
+    origprog<-unlist(paste0(ind$filename[ind$type=="program"]))
+    software.used<-unlist(paste0(ind$software.used[ind$type=="program"]))
 
-tab3data<-data.frame(Program="",
-                         Description=IOD$description,
-                         Input_Output_Dependency="")
+tab3data<-data.frame(Program_Original_names="",
+                         Description="",
+                         Input_Output_log_file_original_names="")
 tab = FlexTable(data = tab3data, header.columns=T)
 
 for(i in 1:length(origprog)){
 op<-paste0("./programs/",prog[i])
-tab[i,1] = pot(prog[i],hyperlink =op,
-textBold( color = '#0000EE', underline = F ) )+ " \n(original:" +pot(origprog[i])+")"
+#tab[i,1] = pot(prog[i],hyperlink =op,
+#textBold( color = '#0000EE', underline = F ) )+ " \n(original:" +pot(origprog[i])+")"
+
+tab[i,1] = pot(prog[i])+ "\n(original:" +pot(origprog[i])+")"
+tab[i,2] = pot("Software used: ",textBold())+ software.used[i]+space+
+          pot("Purpose: ",textBold())+progdes[i]
+
+
 
       io1<-lst[grep(prono[i],lst$proNo.input),]
       io2<-lst[grep(prono[i],lst$proNo.output),]
       io3<-lst[grep(prono[i],lst$progNo.dependent),]
 
 if(nrow(io1)==0){
-tt =  pot("Input",textBold())
+tt =  pot("",textBold())
 }else{
   zz0<-""
   for(io in 1:nrow(io1)){
@@ -665,7 +651,8 @@ tt =  pot("Input",textBold())
     orf<-paste0("(original:",io1$filename[io],")")
     col='#0000EE'
     space="\n  "
-    zz0<-zz0+pot(txtins,hyperlink=insert,textBold(color=col,underline = F ))+space+pot(orf,textNormal())+space}}
+    #zz0<-zz0+pot(txtins,hyperlink=insert,textBold(color=col,underline = F ))+space+pot(orf,textNormal())+space}}
+    zz0<-zz0+pot(txtins,textNormal())+space+pot(orf,textNormal())+space}}
 
 if(nrow(io2)==0){
   zz1 =  pot("",textBold())
@@ -679,8 +666,9 @@ for(io in 1:nrow(io2)){
   orf<-paste0("(original:",io2$filename[io],")")
   col='#0000EE'
   space="\n  "
-zz1<-zz1+pot(txtins,hyperlink=insert,textBold(color=col,underline = F ))+space+pot(orf,textNormal())+space}
-  }
+#zz1<-zz1+pot(txtins,hyperlink=insert,textBold(color=col,underline = F ))+space+pot(orf,textNormal())+space}
+  zz1<-zz1+pot(txtins,textNormal())+space+pot(orf,textNormal())+space}
+    }
 
 if(nrow(io3)==0){
   zz2 =  pot("",textBold())
@@ -694,10 +682,11 @@ if(nrow(io3)==0){
       orf<-paste0("(original:",io3$filename[io],")")
       col='#0000EE'
       space="\n  "
-      zz2<-zz2+pot(txtins,hyperlink=insert,textBold(color=col,underline = F ))+space+pot(orf,textNormal())+space}
-  }
+    #  zz2<-zz2+pot(txtins,hyperlink=insert,textBold(color=col,underline = F ))+space+pot(orf,textNormal())+space}
+      zz2<-zz2+pot(txtins,textNormal())+space+pot(orf,textNormal())+space}
+      }
 
-  tab[i,3] =pot("Input",textBold())+"\n "+zz0+"\n  "+pot("Output",textBold())+"\n  "+zz1+"\n  "+pot("Dependency",textBold())+"\n  "+zz2
+  tab[i,3] =pot("[Input]",textBold())+"\n "+zz0+"\n  "+pot("[Output]",textBold())+"\n  "+zz1+"\n  "+pot("[Dependency]",textBold())+"\n  "+zz2
 }}else{
 if(length(dir(progdir))>=1&nrow(IOD)==0){
   tab3data<-data.frame(Original=origprog,
@@ -841,21 +830,22 @@ step1<-function(working.folder){
   setwd(working.folder)
   if(!"list of files.csv"%in%dir()){
     lf<-data.frame(
-      filename=c("data.csv","nonmem (PCSmisch package needed)","prog1"),
-      type=c("data","nnm","prog"),
+      filename=c("data.csv","nonmem dataset","txt"),
+      type=c("dataset","dataset","prog"),
       extension=c("csv","","txt"),
       rename=c("pkdata","patab","phxsetting"),
-      keyvar=c("USUBJID,TIME","ID,TIME",""),
-      Structure=c("per subject per time point","per subject per time point",""),
-      #xptconvert=c("1","1","1"),
-      Program=c("NA","phxsetting",""),
-      description=c("PK dataset","Posthoc","Phoenix settings")	,
-      sourcepath=c("copy/paste path","",""),
-      progNo=c("unique number","ex.#1a",""),
-      proNo.input=c("could be multiple","#2b#3a",""),
-      proNo.output=c("could be multiple","#2b#3a",""),
-      progNo.dependent=c("could be multiple","#2b#3a","NOTE:that these R functions\n should be included as program\n but without progNo, i.e leave blank cell"))
-    write.csv(lf,"list of files.csv")
+      keyvar=c("optional ex:USUBJID,TIME","optional ex:ID,TIME",""),
+      Structure=c("optional ex:per subject per time point","optional ex:per subject per time point",""),
+      Program=c("script or program name if applicable ex:phxsetting","script or program name if applicable ex:phxsetting",""),
+      description=c("Optional ex: PK dataset","optional ex:Posthoc","optional ex:Phoenix settings")	,
+      progNo=c("for PMDA filing","label programs ex: #1a",""),
+      software.used=c("for PMDA filing","ex:NONMEM VERSION 7.4.3",""),
+      Purpose=c("for PMDA filing","ex:NONMEM control stream of population PK base model",""),
+      proNo.input=c("for PMDA","map input file or dataset for ex: #1a",""),
+      proNo.output=c("for PMDA","map output file or dataset for ex: #1a",""),
+      progNo.dependent=c("for PMDA","map dependency file for ex:#1a",""),
+      sourcepath=c("copy/paste the source path from File explorer","",""))
+    write.csv(lf,"list of files.csv",row.names =F)
   }}
 
 
@@ -888,42 +878,31 @@ step2<-function(){
 
 step3<-function(){
   setwd(working.folder)
-  dir.create("Backup csv")
-  lib<-read.csv("studydefinelist.csv")
-  filename = paste("./Backup csv/Original studydefinelist-",format(Sys.time(), "%a-%b-%d-%H-%M-%S-%Y"),sep="")
+  lib<-read.csv("studydefinelist.csv",stringsAsFactors=F)
+  filename = paste("./Backup/Original_studydefinelist-",format(Sys.time(), "%a-%b-%d-%H-%M-%S-%Y"),sep="")
   write.csv(lib,paste0(filename,".csv"))
-  lib2<-read.csv("Var_name_GT8.csv")
-  filename = paste("./Backup csv/Original Var_name_GT8-",format(Sys.time(), "%a-%b-%d-%H-%M-%S-%Y"),sep="")
-  write.csv(lib2,paste0(filename,".csv"))
+  lib2<-read.csv("Var_name_GT8.csv",stringsAsFactors=F)
+  lib2$change.name[is.na(lib2$change.name)]<-"unchanged"
 
-  isnam<-unique(lib2$file)
-
-  rem<-lib[lib$to.remove.type.1==1&!is.na(lib$to.remove.type.1),c("Variable","file")]
-  rem<-rbind(rem,lib2[lib2$to.remove.type.1==1&!is.na(lib2$to.remove.type.1),c("Variable","file")])
-  rem1<-lib2[lib2$to.remove.type.1==0&!is.na(lib2$to.remove.type.1),c("Variable","file","change.name")]
-
-  lib<-chclass(lib,c("Variable","file"),"char")
-
-  rem<-chclass(rem,c("Variable","file"),"char")
-  rem1<-chclass(rem1,c("Variable","file","change.name"),"char")
-
-  for(d in unique(c(rem$file,rem1$file))){
-    dc<-read.csv(paste0("./input/",d))
-    names(dc)<-toupper(names(dc))
-    var<-c(rem$Variable[rem$file==d])
-    for(d1 in var){
-      dc[,names(dc)==d1]<-NULL
-      lib<-lib[lib$Variable!=d1,]}
-    #change name  }
-    var2<-lib2[lib2$file==d&lib2$change.name!="Enter new name",]
-    for(d2 in var2$Variable){
-      names(dc)[names(dc)==d2]<-as.character(var2$change.name[var2$Variable==d2])
-      lib$Variable[lib$Variable==d2&lib$file==d]<-as.character(var2$change.name[var2$Variable==d2])
-    }
-
-    write.csv(dc,paste0("./input/",d),row.names=F)
+  lib$dum<-paste(lib$Variable,lib$file,sep="-")
+  lib2$dum<-paste(lib2$Variable,lib2$file,sep="-")
+  for(i in unique(lib2$file))
+  dc<-read.csv(paste0("./input/",i))
+  write.csv(dc,paste0("./input/orig_",i))
+  act<-lib2[lib2$file==i,]
+  for(j in 1:nrow(act)){
+    if(lib2$change.name[j]=="remove"){
+      dc[,names(dc)[names(dc)%in%lib2$Variable[j]]]<-NULL
+      lib<-lib[!lib$dum%in%lib2$dum[j],]
+      }else{if(lib2$change.name[j]=="unchanged"){lib<-lib;dc<-dc}else{
+    names(dc)[names(dc)%in%lib2$Variable[j]]<-as.character(lib2$change.name[j])
+    lib$Variable[lib$dum%in%lib2$dum]<-as.character(lib2$change.name[j])
+      }}
+    lib$dum<-NULL
+    write.csv(dc,paste0("./input/",i),row.names=F)
     write.csv(lib,"studydefinelist.csv",row.names=F)
-  }}
+    }
+}
 
 #' Step 4
 #'
