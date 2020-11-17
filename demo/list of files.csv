@@ -1,3 +1,8 @@
 filename,type,rename,keyvar,Structure,Program,description,progNo,Software.version,Purpose,proNo.input,proNo.output,progNo.dependent,sourcepath
-ODON_POPPK_31OCT20.csv,dataset,pkdata,"optional ex:USUBJID,TIME",optional ex:per subject per time point,script or program name if applicable ex:phxsetting,Optional ex: PK dataset,,,,,,,C:\Users\lpheng\Desktop\packdev\xptdef2\demo\source
-cpt2.mod,program,modcpt2,,,,optional ex:Phoenix settings,,,,,,,C:\Users\lpheng\Desktop\ODONAT\NONMEM
+Exposures_neonate.csv,dataset,neonate,"ID, DURATION,REGIMEN",per ID per dose,,Exposure in neonates <1 month,,,,,,,C:\Users\lpheng\Certara\USWM-PMX-LOFE-1253 - Project Data\Deliverables\Simulation\XIE_maturation\Neonate
+freq_distribution_1m17y_QID2W.csv,dataset,p1m17y,"ID, AGECAT",per ID,,Exposure in pediatirics 1 month to 17 years,,,,,,,C:\Users\lpheng\Certara\USWM-PMX-LOFE-1253 - Project Data\Deliverables\Simulation\XIE_maturation\output
+freq_distribution_2_6y_1_QID2W.csv,dataset,p2to6y1,"ID, AGECAT",per ID,,Exposure in pediatirics 2-6 years by weight band 1,,,,,,,C:\Users\lpheng\Certara\USWM-PMX-LOFE-1253 - Project Data\Deliverables\Simulation\XIE_maturation\output
+freq_distribution_2_6y_2_QID2W.csv,dataset,p2to6y2,"ID, AGECAT",per ID,,Exposure in pediatirics 2-6 years by weight band 2,,,,,,,C:\Users\lpheng\Certara\USWM-PMX-LOFE-1253 - Project Data\Deliverables\Simulation\XIE_maturation\output
+freq_distribution_6_12y_1_QID2W.csv,dataset,p6to12y1,"ID, AGECAT",per ID,,Exposure in pediatirics 6-12 years by weight band 1,,,,,,,C:\Users\lpheng\Certara\USWM-PMX-LOFE-1253 - Project Data\Deliverables\Simulation\XIE_maturation\output
+freq_distribution_6_12y_2_QID2W.csv,dataset,p6to12y2,"ID, AGECAT",per ID,,Exposure in pediatirics 6-12 years by weight band 2,,,,,,,C:\Users\lpheng\Certara\USWM-PMX-LOFE-1253 - Project Data\Deliverables\Simulation\XIE_maturation\output
+freq_distribution_12_17y_1and2_QID2W.csv,dataset,p12to17y,"ID, AGECAT",per ID,,Exposure in pediatirics 12-17 years by weight band,,,,,,,C:\Users\lpheng\Certara\USWM-PMX-LOFE-1253 - Project Data\Deliverables\Simulation\XIE_maturation\output

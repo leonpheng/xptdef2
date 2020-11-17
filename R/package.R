@@ -228,8 +228,9 @@ definelist<-function(...){
 
   if(define.library!="no"){
     lib<-read.csv(define.library)
-    var[,1]<-tolower(var[,1]);lib[,1]<-tolower(lib[,1])
+    lib<-lib[,c("Variable","Unit","Detailed.description","Enter.label.here")]
     names(var)[1]<-"Variable"
+    var[,"Variable"]<-tolower(var[,"Variable"]);lib[,"Variable"]<-tolower(lib[,"Variable"])
     var<-dplyr::left_join(var,lib)
     head(var)
     lib<-with(var,data.frame(
@@ -278,9 +279,7 @@ lib1$labelsize<-nchar(as.character(lib1$"Variable"))
     print("4) Note that step3() is optional thus you can change variable name manually in the source and in the studydefinelist.csv and run step4()")
     print("5) Note also that SASexport will trim the variable name to 8 characters but this may cause duplicated name in the output")
   }else{print("Everything look fine, please fill out studydefinelist.csv, have it QCd and run step4. Step4: add title to define document ex: step4(title=title)")}
-
 write.csv(nodup(lib1[,keep],c("Variable","file"),"all"),paste(pathwork,"studydefinelist.csv",sep="/"),row.names=F)
-
 }
 
 #' Update library
