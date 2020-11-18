@@ -235,7 +235,7 @@ definelist<-function(...){
     head(var)
     lib<-with(var,data.frame(
       Variable=Variable,
-      Unit="",
+      Unit=Unit,
       Detailed.description=Detailed.description,
       Enter.label.here=Enter.label.here,
       Max.40.char=nchar(as.character(Enter.label.here)),
@@ -548,7 +548,7 @@ tabn<-c("Dataset", "Original Name",   "Description",     "Key Variables",    "Lo
   hyp1<-paste0(sub(".csv","",outdir),".xpt")
   for(i in 1:length(hyp1)){
     loc1<-paste0(xpt.location,hyp1[i])
-    hyp11<-gsub(loc,"./",loc1)
+    hyp11<-loc1#gsub("./",loc1)
     #hyp11<-paste0("./datasets/",hyp1[i])
     tab[i,5] = pot( hyp0[i], hyperlink = hyp11,
                     textBold( color = '#0000EE', underline = F ) ) }
@@ -887,34 +887,35 @@ step2<-function(){
 #' @examples
 #' step3()
 
-
 step3<-function(){
   setwd(working.folder)
   lib<-read.csv("studydefinelist.csv",stringsAsFactors=F)
   filename = paste("./Backup/Original_studydefinelist-",format(Sys.time(), "%a-%b-%d-%H-%M-%S-%Y"),sep="")
   write.csv(lib,paste0(filename,".csv"))
   lib2<-read.csv("Var_name_GT8.csv",stringsAsFactors=F)
-  lib2$change.name[is.na(lib2$change.name)]<-"unchanged"
-
+  lib2<-chclass(lib2,names(lib2),"char")
+  lib2$change.name[is.na(lib2$change.name)|lib2$change.name==""]<-"unchanged"
   lib$dum<-paste(lib$Variable,lib$file,sep="-")
   lib2$dum<-paste(lib2$Variable,lib2$file,sep="-")
-  for(i in unique(lib2$file))
+
+  rem<-lib2[lib2$change.name=="remove",]
+  unch<-lib2[lib2$change.name=="unchanged",]
+  rnm<-lib2[!lib2$change.name%in%c("unchanged","remove"),]
+
+lib3<-lib[!lib$dum%in%rem$dum,]
+lib3$Variable[lib3$dum%in%rnm$dum]<-rnm$change.name[rnm$dum%in%lib3$dum]
+
+for(i in unique(lib2$file)){
   dc<-read.csv(paste0("./input/",i))
-  write.csv(dc,paste0("./input/orig_",i))
-  act<-lib2[lib2$file==i,]
-  for(j in 1:nrow(act)){
-    if(lib2$change.name[j]=="remove"){
-      dc[,names(dc)[names(dc)%in%lib2$Variable[j]]]<-NULL
-      lib<-lib[!lib$dum%in%lib2$dum[j],]
-      }else{if(lib2$change.name[j]=="unchanged"){lib<-lib;dc<-dc}else{
-    names(dc)[names(dc)%in%lib2$Variable[j]]<-as.character(lib2$change.name[j])
-    lib$Variable[lib$dum%in%lib2$dum]<-as.character(lib2$change.name[j])
-      }}
-    lib$dum<-NULL
-    write.csv(dc,paste0("./input/",i),row.names=F)
-    write.csv(lib,"studydefinelist.csv",row.names=F)
-    }
-}
+  rem1<-rem[rem$file==i,]
+  rnm1<-rnm[rnm$file==i,]
+  names(dc)<-toupper(names(dc))
+  ind<-!names(dc)%in%rem1$Variable
+  dc<-dc[,ind]
+  names(dc)[names(dc)%in%rnm1$Variable]<-rnm1$change.name
+    write.csv(dc,paste0("./input/",i),row.names=F)}
+    write.csv(lib3,"studydefinelist.csv",row.names=F)
+  }
 
 #' Step 4
 #'
