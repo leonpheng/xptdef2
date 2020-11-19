@@ -296,7 +296,7 @@ lib.update<-function(prevlib="//certara.com/sites/S02-Cary/Consulting/Projects/r
   if(!is.null(prevlib)){
   pl<-read.csv(prevlib)
   lib<-read.csv(newlib)
-  pl1<-rbind(pl[,intersect(names(pl),names(lib))],lib[,intersect(names(pl),names(lib))])
+  pl1<-rbind(lib[,intersect(names(pl),names(lib))],pl[,intersect(names(pl),names(lib))])
   pl1<-pl1[!duplicated(pl1$Variable),]
   write.csv(pl1,prevlib)
   write.csv(pl1,paste0(prevlib,"_",Sys.Date(),".csv"))
