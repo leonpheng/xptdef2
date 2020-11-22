@@ -217,17 +217,26 @@ importfiles<-function(...){
 #' definelist()
 
 definelist<-function(...){
+
+  read.csv.custom <- function(filename) {
+    x <- read.csv( filename, stringsAsFactors=F )
+    names(x) <- gsub( x=names(x), pattern="[.]", replacement="_" )
+    return(x)
+  }
+
   setwd(working.folder)
   pathwork<-getwd()
   odir1<-paste0(pathwork,"/input/")
   var<-NULL
   for(i in dir(odir1)){
-    var1<-data.frame(orivar=unlist(names(read.csv(paste0(odir1,i)))),file=i)
+    fi<-read.csv.custom(paste0(odir1,i))
+    #var1<-data.frame(orivar=unlist(names(read.csv(paste0(odir1,i)))),file=i)
+    var1<-data.frame(orivar=unlist(names(fi)),file=i)
     var<-rbind(var,var1)
   }
 
   if(define.library!="no"){
-    lib<-read.csv(define.library)
+    lib<-read.csv(define.library,stringsAsFactors=F)
     lib<-lib[,c("Variable","Unit","Detailed.description","Enter.label.here")]
     names(var)[1]<-"Variable"
     var[,"Variable"]<-tolower(var[,"Variable"]);lib[,"Variable"]<-tolower(lib[,"Variable"])
@@ -249,7 +258,6 @@ definelist<-function(...){
       Max.40.char="USE FUNCTION LEN()",
       file=file))
     }
-
   keep<-names(lib)
 
   lib1<-lib#plyr::join(var,lib)
@@ -257,29 +265,29 @@ definelist<-function(...){
   lib1$"Max.40.char"<-nchar(as.character(lib1$"SAS.label"))
 lib1$labelsize<-nchar(as.character(lib1$"Variable"))
 
-  keep<-c("Variable","Unit","Detailed.description","Enter.label.here","Max.40.char","file")
+keep<-c("Variable","Unit","Detailed.description","Enter.label.here","Max.40.char","file")
 
-  lib1$Variable<-toupper(lib1$Variable)
+lib1$Variable<-toupper(lib1$Variable)
+lib1$Enter.label.here<-as.character(lib1$Enter.label.here)
+lib1$ISSUE<-""
+lib1$ISSUE<-ifelse(nchar(lib1$Variable)>8,"VarName>8",lib1$ISSUE)
+lib1$ISSUE<-ifelse(nchar(lib1$Enter.label.here)>40,paste(lib1$ISSUE," & ","Label>40"),lib1$ISSUE)
+lib1$ISSUE<-ifelse(is.na(lib1$Enter.label.here),"Required information missing",lib1$ISSUE)
+lib1$RESOLUTION<-""
+lib1$Max.40.char<-NULL
+#lib2<-lib1[nchar(lib1$Variable)>8,]
 
-  lib2<-lib1[nchar(lib1$Variable)>8,]
-  lib3<- lib1[grepl(".", lib1$Variable,
-                    fixed = T),]
-  if(nrow(lib2)>=1|nrow(lib3)>=1){
-    lib2<-rbind(lib2,lib3)
-    lib2$change.name<-""
-    lib2<-nodup(lib2,names(lib2),"all")
-    write.csv(lib2[,c("Variable","file","labelsize","change.name")],paste(pathwork,"Var_name_GT8.csv",sep="/"),row.names=F)
-    print("WARNING because:")
-    print("1) Variable name is longer than 8 characters")
-    print("2) Variable name contains dot (.) ")
-    print("Solution:")
-    print("1) Complete studydefinelist.csv")
-    print("2) Open Var_name_GT8.csv and rename the variable in column change.name")
-    print("3) Save Var_name_GT8.csv and run step3() to apply the change")
-    print("4) Note that step3() is optional thus you can change variable name manually in the source and in the studydefinelist.csv and run step4()")
-    print("5) Note also that SASexport will trim the variable name to 8 characters but this may cause duplicated name in the output")
-  }else{print("Everything look fine, please fill out studydefinelist.csv, have it QCd and run step4. Step4: add title to define document ex: step4(title=title)")}
-write.csv(nodup(lib1[,keep],c("Variable","file"),"all"),paste(pathwork,"studydefinelist.csv",sep="/"),row.names=F)
+#  lib3<- lib1[grepl(".", lib1$Variable,
+#                    fixed = T),]
+if(length(lib1$ISSUE[lib1$ISSUE!=""])>0){
+    #lib2<-rbind(lib2,lib3)
+    #lib2$change.name<-""
+    #lib2<-nodup(lib2,names(lib2),"all")
+    #write.csv(lib2[,c("Variable","file","labelsize","change.name")],paste(pathwork,"Var_name_GT8.csv",sep="/"),row.names=F)
+    print("WARNING:")
+    print(paste(length(lib1$ISSUE[lib1$ISSUE!=""]),"issues encountered. Please fix them in studydefinelist.csv then have it QC'd before running step4"))
+}else{print("Everything looks fine. The QC of the define list may be performed before running Step4")}
+write.csv(nodup(lib1,c("Variable","file"),"all"),paste(pathwork,"studydefinelist.csv",sep="/"),row.names=F)
 }
 
 #' Update library
@@ -326,6 +334,13 @@ lib.update<-function(prevlib="//certara.com/sites/S02-Cary/Consulting/Projects/r
 #' generateXPT()
 
 generateXPT<-function(range.character=NULL){
+
+  read.csv.custom <- function(filename) {
+    x <- read.csv( filename, stringsAsFactors=F )
+    names(x) <- gsub( x=names(x), pattern="[.]", replacement="_" )
+    return(x)
+  }
+
   setwd(working.folder)
   pathwork<-getwd()
   pathdir<-pathwork
@@ -376,7 +391,8 @@ generateXPT<-function(range.character=NULL){
   #############################################
   #detail<- read.xls(paste(sourcepath,definelib,sep="/"), sheet = 1)
   definelib<-"studydefinelist.csv"
-  detail<- read.csv(paste(pathwork,definelib,sep="/"))
+  detail1<- read.csv(paste(pathwork,definelib,sep="/"),stringsAsFactors=F)
+  detail<-detail1
   #numkeep<-detail$Variable[detail$Numflg==1]
   detail$"Variable"<-as.character(detail$"Variable")
   detail$Enter.label.here<-capitalize(as.character(detail$Enter.label.here))
@@ -385,12 +401,15 @@ generateXPT<-function(range.character=NULL){
 for (j in 1:nrow(inp)){
     require(SASxport)
     #numkeep<-detail$Variable[detail$Numflg==1]
-    detail<- read.csv(paste(pathwork,definelib,sep="/"))
+  #read.csv.custom(paste(pathwork,definelib,sep="/"))
+    detail<- read.csv(paste(pathwork,definelib,sep="/"),stringsAsFactors=F)
     detail<-detail[detail$file==as.character(inp$input[j]),]
     detail$"Variable"<-as.character(detail$"Variable")
     detail$Enter.label.here<-capitalize(as.character(detail$Enter.label.here))
     detail$SAS.label<-capitalize(as.character(detail$Enter.label.here))
+
     pkdata <- read.csv(paste(input,inp$input[j],sep="/"),stringsAsFactors = FALSE)
+    pkdata <-read.csv.custom(paste(input,inp$input[j],sep="/"))
     pkdata<-chclass(pkdata,names(pkdata),"char")
     names(pkdata)<-toupper(names(pkdata))
     pkdata<-chclass(pkdata,names(pkdata),"char")
@@ -398,7 +417,36 @@ for (j in 1:nrow(inp)){
     if(!is.null(checkclass)){
       pkdata<-autoclass(pkdata)
     }
+##APPLY CHANGES
+    #setwd(working.folder)
+    lib<-detail
+    lib2<-chclass(lib,names(lib),"char")
+    lib2$RESOLUTION[is.na(lib$RESOLUTION)|lib$RESOLUTION==""]<-"unchanged"
+    #lib$dum<-paste(lib$Variable,lib$file,sep="-")
+    #lib2$dum<-paste(lib2$Variable,lib2$file,sep="-")
 
+    rem<-lib2[lib2$RESOLUTION=="remove",]
+    unch<-lib2[lib2$RESOLUTION=="unchanged",]
+    rnm<-lib2[!lib2$RESOLUTION%in%c("unchanged","remove"),]
+
+    lib3<-lib[!lib$Variable%in%rem$Variable,]
+    lib3$Variable[lib3$Variable%in%rnm$Variable]<-rnm$RESOLUTION
+
+    #for(i in unique(lib2$file)){
+      dc<-pkdata#read.csv(paste0("./input/",i))
+      rem1<-rem
+      rnm1<-rnm
+      names(dc)<-toupper(names(dc))
+      ind<-!names(dc)%in%rem1$Variable
+      dc<-dc[,ind]
+      names(dc)[names(dc)%in%rnm1$Variable]<-rnm1$RESOLUTION
+    #write.csv(dc,paste0("./input/",i),row.names=F)}
+    #write.csv(lib3,"studydefinelist.csv",row.names=F)
+###############
+if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Missing label found, please update.",lib3[is.na(lib3$Enter.label.here),c("Variable")]))
+
+      detail<-lib3
+      pkdata<-dc
     for (h in 1:nrow(detail)){
       tryCatch(label(pkdata[,paste(detail$Variable[h])])<- paste(detail$SAS.label[h]),error=function(e) NULL )
     }
@@ -556,6 +604,7 @@ tabn<-c("Dataset", "Original Name",   "Description",     "Key Variables",    "Lo
   if("logo.jpg"%in%dir("c:/lhtemplate")){
     doc<-doc%>%addImage("c:/lhtemplate/logo.jpg", par.properties = parProperties(text.align = "center"),width = 3.35, height = 1.6)
   }
+
   doc<-doc %>%
     addParagraph(pot(title,style1),par.properties = parProperties(text.align = "center")) %>%
     addPageBreak()%>%
@@ -642,9 +691,9 @@ for(i in 1:length(origprog)){
 op<-paste0("./programs/",prog[i])
 #tab[i,1] = pot(prog[i],hyperlink =op,
 #textBold( color = '#0000EE', underline = F ) )+ " \n(original:" +pot(origprog[i])+")"
-
+space="\n  "
 tab[i,1] = pot(prog[i])+ "\n(original:" +pot(origprog[i])+")"
-tab[i,2] = pot("Software used: ",textBold())+ software.used[i]+space+pot("Purpose: ",textBold())+progdes[i]
+tab[i,2] = pot("Software used: ",textBold())+software.used[i]+space+pot("Purpose: ",textBold())+progdes[i]
 
 
 
