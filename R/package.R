@@ -861,18 +861,17 @@ cleardefCSV1<-function(...){
 #' step4(title)
 
 helps<-function(...){
-  x<-data.frame(stepBYstep=seq(11),
-                Procedure=c("working.folder= path",
-                            "run step1(working.folder)",
-                            "edit list of files.csv and save",
-                            "***For classic define, leave the progNo columns blank****",
-                            "define.library= set to no or add library name if available",
-                            "run step2()",
-                            "edit and save studydefinelist.csv and Var_name_GT8.csv if applicable",
-                            "run step3() to apply the corrections requested in Var_name_GT8.csv",
-                            "***The variable name longer than 8 characters will be corrected in the CSV file and studydefinelist***",
-                            "run step4(title) #enter project title",
-                            "edit and format the define.doc"))
+  x<-data.frame(stepBYstep=seq(10),
+                Procedure=c("require(xptdef2)",
+                  "working.folder= path",
+                            "RUN step1(working.folder) and go to working.folder path",
+                            "EDIT list of files.csv then save",
+                            "TYPE IN: define.library= 1) set to no or 2) specifiy path+library file (csv)",
+                            "RUN step2()",
+                            "EDIT studydefinelist.csv. Note: Label should not be NA",
+                            "Note: Variable could be removed (type in remove) or renamed (type in new name) using RESOLUTION column",
+                            "RUN step4(). Note: the script will be aborted if NA found in Label column of studydefinelist.csv. Fix the issue and rerun again step4",
+                            "EDIT and finalize the define.docx file located in datasets subfolder folder. TIPS: search and replace # by hyphen and XXXX by undrscore"))
   print(x)
 }
 
