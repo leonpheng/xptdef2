@@ -408,7 +408,7 @@ for (j in 1:nrow(inp)){
     detail$"Variable"<-as.character(detail$"Variable")
     detail$Enter.label.here<-capitalize(as.character(detail$Enter.label.here))
     detail$SAS.label<-capitalize(as.character(detail$Enter.label.here))
-    detail$"Detailed.description"[nchar(detail$Variable)>8]<-paste0(detail$"Detailed.description"[nchar(detail$Variable)>8],". Original variable name = ",detail$Variable[nchar(detail$Variable)>8])
+    detail$"Detailed.description"[nchar(detail$Variable)>8]<-paste0(detail$"Detailed.description"[nchar(detail$Variable)>8]," Note Original variable name = ",detail$Variable[nchar(detail$Variable)>8])
     pkdata <- read.csv(paste(input,inp$input[j],sep="/"),stringsAsFactors = FALSE)
     pkdata <-read.csv.custom(paste(input,inp$input[j],sep="/"))
     pkdata<-chclass(pkdata,names(pkdata),"char")
@@ -467,7 +467,7 @@ if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Missing label found, 
     eval(parse(text=sav))
 
     require(SASxport)   # to be able to read the xport files
-    data<-read.xport(paste(outputdir,"/",inp$outp[j],".xpt",sep=""))
+    data<-SASxport::read.xport(paste(outputdir,"/",inp$outp[j],".xpt",sep=""),name.chars=c("_","-","&","@"))
     definedataset <- data.frame(Variable=colnames(data))
     range<-vardefine(data,maxlevel=10,labels=T,digits=6,vartype=T,exp.csv=T)
     data1<-data.frame(var=colnames(data))
@@ -476,8 +476,8 @@ if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Missing label found, 
     rangepkdat$"Code/Range"<-range$"Code/Range"
     names(rangepkdat)<-c("SAS Variable","SAS Label","Type","Code/Range","Unit","Detailed.description")
     rangepkdat<-rangepkdat[,c("SAS Variable","SAS Label","Type","Code/Range","Unit","Detailed.description")]
-    rangepkdat$"SAS Variable"<-gsub(rangepkdat$"SAS Variable",pattern="\\_",replacement="XXXX")
-    rangepkdat$"SAS Variable"<- data1
+    #rangepkdat$"SAS Variable"<-gsub(rangepkdat$"SAS Variable",pattern="\\_",replacement="XXXX")
+    #rangepkdat$"SAS Variable"<- data1
     detach("package:SASxport", unload = T)
 
     ind<-as.numeric(row.names(rangepkdat[rangepkdat$"Code/Range"=="-",]))
