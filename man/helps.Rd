@@ -38,7 +38,7 @@ working.folder<-"C:/Users/lpheng/Desktop/packdev/test" #set the working path
 step1(working.folder)
 define.library="no" # or enter the name of the library
 step2()
-title="Test" # Mondatory. this title will appear in define
+title="Test" # Mandatory. this title will appear in define
 step4(title)
 }
 \keyword{helps}
