@@ -650,7 +650,7 @@ tabn<-c("Dataset", "Original Name",   "Description",     "Key Variables",    "Lo
     tab[4,1] = pot(hyp2, hyperlink = hyp11,
                    textBold( color = '#0000EE', underline = F ) )
     #as.character(inp1$Dataset[j])
-    if(usedprog[j]=="NA"){
+    if(usedprog[j]=="NA"|usedprog[j]==""){
       tab[5,1] =as.character(usedprog[j])}else{
         hyp2<- as.character(paste0(usedprog[j],".txt"))
         hyp11<-paste0(prog.location,hyp2)
