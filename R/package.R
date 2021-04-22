@@ -407,7 +407,7 @@ for (j in 1:nrow(inp)){
     detail$"Variable"<-as.character(detail$"Variable")
     detail$Enter.label.here<-capitalize(as.character(detail$Enter.label.here))
     detail$SAS.label<-capitalize(as.character(detail$Enter.label.here))
-    detail$"Detailed.description"[nchar(detail$Variable)>8]<-paste0(detail$"Detailed.description"[nchar(detail$Variable)>8]," Note: original variable name = ",detail$Variable[nchar(detail$Variable)>8],".")
+    detail$"Detailed.description"[nchar(detail$Variable)>8]<-paste0(detail$"Detailed.description"[nchar(detail$Variable)>8],". Note: original variable name = ",detail$Variable[nchar(detail$Variable)>8],".")
     pkdata <- read.csv(paste(input,inp$input[j],sep="/"),stringsAsFactors = FALSE)
     pkdata <-read.csv.custom(paste(input,inp$input[j],sep="/"))
     pkdata<-chclass(pkdata,names(pkdata),"char")
