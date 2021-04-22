@@ -261,8 +261,8 @@ definelist<-function(...){
   keep<-names(lib)
 
   lib1<-lib#plyr::join(var,lib)
-  lib1$"SAS.label"<-lib1$"Enter.label.here"
-  lib1$"Max.40.char"<-nchar(as.character(lib1$"SAS.label"))
+  #lib1$"SAS.label"<-lib1$"Enter.label.here"
+  lib1$"Max.40.char"<-nchar(as.character(lib1$"Enter.label.here"))
 lib1$labelsize<-nchar(as.character(lib1$"Variable"))
 
 keep<-c("Variable","Unit","Detailed.description","Enter.label.here","Max.40.char","file")
@@ -270,9 +270,9 @@ keep<-c("Variable","Unit","Detailed.description","Enter.label.here","Max.40.char
 lib1$Variable<-toupper(lib1$Variable)
 lib1$Enter.label.here<-as.character(lib1$Enter.label.here)
 lib1$ISSUE<-""
-lib1$ISSUE<-ifelse(nchar(lib1$Variable)>8,"VarName>8",lib1$ISSUE)
-lib1$ISSUE<-ifelse(nchar(lib1$Enter.label.here)>40,paste(lib1$ISSUE," & ","Label>40"),lib1$ISSUE)
-lib1$ISSUE<-ifelse(is.na(lib1$Enter.label.here),"Required information are missing",lib1$ISSUE)
+lib1$ISSUE<-ifelse(nchar(lib1$Variable)>8,"Issue#1:VarName>8",lib1$ISSUE)
+lib1$ISSUE<-ifelse(nchar(lib1$Enter.label.here)>40,paste(lib1$ISSUE,"Issue#2:","Label>40"),lib1$ISSUE)
+lib1$ISSUE<-ifelse(is.na(lib1$Enter.label.here),"Issue#3:Required information are missing",lib1$ISSUE)
 lib1$RESOLUTION<-""
 lib1$Max.40.char<-NULL
 #lib2<-lib1[nchar(lib1$Variable)>8,]
@@ -286,7 +286,7 @@ if(length(lib1$ISSUE[lib1$ISSUE!=""])>0){
     #write.csv(lib2[,c("Variable","file","labelsize","change.name")],paste(pathwork,"Var_name_GT8.csv",sep="/"),row.names=F)
     print("WARNING:")
     print(paste(length(lib1$ISSUE[lib1$ISSUE!=""]),"issues encountered. Please fix them in studydefinelist.csv then have it QC'd before running step4"))
-}else{print("Everything looks fine. The QC of the define list may be performed before running Step4")}
+}else{print("Everything looks fine. The QC of the define list may be performed prior to running Step3")}
 write.csv(nodup(lib1,c("Variable","file"),"all"),paste(pathwork,"studydefinelist.csv",sep="/"),row.names=F)
 }
 
@@ -340,7 +340,6 @@ generateXPT<-function(range.character=NULL){
     names(x) <- gsub( x=names(x), pattern="[.]", replacement="_" )
     return(x)
   }
-
   setwd(working.folder)
   pathwork<-getwd()
   pathdir<-pathwork
@@ -408,7 +407,7 @@ for (j in 1:nrow(inp)){
     detail$"Variable"<-as.character(detail$"Variable")
     detail$Enter.label.here<-capitalize(as.character(detail$Enter.label.here))
     detail$SAS.label<-capitalize(as.character(detail$Enter.label.here))
-    detail$"Detailed.description"[nchar(detail$Variable)>8]<-paste0(detail$"Detailed.description"[nchar(detail$Variable)>8],"(Note: original variable name = ",detail$Variable[nchar(detail$Variable)>8],")")
+    detail$"Detailed.description"[nchar(detail$Variable)>8]<-paste0(detail$"Detailed.description"[nchar(detail$Variable)>8]," Note: original variable name = ",detail$Variable[nchar(detail$Variable)>8],".")
     pkdata <- read.csv(paste(input,inp$input[j],sep="/"),stringsAsFactors = FALSE)
     pkdata <-read.csv.custom(paste(input,inp$input[j],sep="/"))
     pkdata<-chclass(pkdata,names(pkdata),"char")
@@ -444,7 +443,7 @@ for (j in 1:nrow(inp)){
     #write.csv(dc,paste0("./input/",i),row.names=F)}
     #write.csv(lib3,"studydefinelist.csv",row.names=F)
 ###############
-if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Missing label found, please update.",lib3[is.na(lib3$Enter.label.here),c("Variable")]))
+if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Stopped by missing label. Please update the define list.",lib3[is.na(lib3$Enter.label.here),c("Variable")]))
 
       detail<-lib3
       pkdata<-dc
@@ -863,17 +862,15 @@ cleardefCSV1<-function(...){
 #' step4(title)
 
 helps<-function(...){
-  x<-data.frame(stepBYstep=seq(10),
+  x<-data.frame(stepBYstep=seq(8),
                 Procedure=c("require(xptdef2)",
-                  "working.folder= path",
-                            "RUN step1(working.folder) and go to working.folder path",
+                            "working.folder= enter full path",
+                            "step1(working.folder)",
                             "EDIT list of files.csv then save",
-                            "TYPE IN: define.library= 1) set to no or 2) specifiy path+library file (csv)",
-                            "RUN step2()",
-                            "EDIT studydefinelist.csv. Note: Label should not be NA",
-                            "Note: Variable could be removed (type in remove) or renamed (type in new name) using RESOLUTION column",
-                            "RUN step4(). Note: the script will be aborted if NA found in Label column of studydefinelist.csv. Fix the issue and rerun again step4",
-                            "EDIT and finalize the define.docx file located in datasets subfolder folder. TIPS: search and replace # by hyphen and XXXX by undrscore"))
+                            "define.library= path/libraryfile.csv",
+                            "step2()",
+                            "EDIT studydefinelist.csv and save.",
+                            "step4(title)"))
   print(x)
 }
 
@@ -889,24 +886,24 @@ helps<-function(...){
 #' @examples
 #' step1(working.folder)
 
-step1<-function(working.folder){
+step1<-function(){
   setwd(working.folder)
   if(!"list of files.csv"%in%dir()){
     lf<-data.frame(
-      filename=c("REQUIRED ex:data.csv","ex:nonmem data","ex:txt file"),
-      type=c("REQUIRED ex:dataset","REQUIRED ex:dataset","REQUIRED ex:program"),
-      rename=c("REQUIRED pkdata","REQUIRED patab","REQUIRED phxsetting"),
-      keyvar=c("OPTIONAL ex:USUBJID,TIME","OPTIONAL ex:ID,TIME",""),
-      Structure=c("OPTIONAL ex:per subject per time point","OPTIONAL ex:per subject per time point",""),
-      Program=c("OPTIONAL ex:phxsetting","",""),
-      description=c("OPTIONAL ex: PK dataset","OPTIONAL ex:Posthoc","OPTIONAL ex:Phoenix settings"),
-      progNo=c("MUST CLEAR THIS COLUMN IF NOT FOR PMDA","","ex:#1a"),
-      Software.version=c("MUST CLEAR THIS COLUMN IF NOT FOR PMDA","","ex:NONMEM VERSION 7.4.3"),
-      Purpose=c("MUST CLEAR THIS COLUMN IF NOT PMDA","","ex:NONMEM control file"),
-      proNo.input=c("MUST CLEAR THIS COLUMN IF NOT PMDA","","Enter #1a if the input used in program #1a"),
-      proNo.output=c("MUST CLEAR THIS COLUMN IF NOT PMDA","","ex:#1a if the output generated by program  #1a"),
-      progNo.dependent=c("MUST CLEAR THIS COLUMN IF NOT PMDA","","ex:#1a if dependency code or script for program #1a"),
-      sourcepath=c("REQUIRED","","copy/paste the path for each file"))
+      filename=c("ex:data.csv","ex:pattab","ex:basemod.txt","ex:setting.R"),
+      type=c("ex:dataset","ex:dataset","ex:program","ex:program"),
+      rename=c("ex:pkdata","ex:residual","ex:basemodel","setting"),
+      keyvar=c("ex:ID,TIME","ex:ID,TIME","not required for program","not required for program"),
+      Structure=c("ex:per subject per time point","ex:per subject per time point","not required for program","not required for program"),
+      Program=c("","ex:basemod","",""),
+      description=c("ex: PK dataset","ex:residual","ex:NONMEM base model","Dependency R script"),
+      progNo=c("","","PMDA ex:#1a","PMDA ex:#1b"),
+      Software.version=c("","","PMDA ex:NONMEM VERSION 7.4.3","PMDA ex:R VERSION 3.0.0"),
+      Purpose=c("","","PMDA ex:NONMEM control file","PMDA ex:R script for tranforming..."),
+      proNo.input=c("PMDA ex:#1a#1b","","",""),
+      proNo.output=c("","PMDA ex:#1a","",""),
+      progNo.dependent=c("","","","ex:#1a"),
+      sourcepath=c("full path in window format","full path in window format","full path in window format","full path in window format"))
     write.csv(lf,"list of files.csv",row.names =F)
   }}
 
@@ -930,44 +927,37 @@ step2<-function(){
 }
 
 
+# step3<-function(){
+#   setwd(working.folder)
+#   lib<-read.csv("studydefinelist.csv",stringsAsFactors=F)
+#   filename = paste("./Backup/Original_studydefinelist-",format(Sys.time(), "%a-%b-%d-%H-%M-%S-%Y"),sep="")
+#   write.csv(lib,paste0(filename,".csv"))
+#   lib2<-read.csv("Var_name_GT8.csv",stringsAsFactors=F)
+#   lib2<-chclass(lib2,names(lib2),"char")
+#   lib2$change.name[is.na(lib2$change.name)|lib2$change.name==""]<-"unchanged"
+#   lib$dum<-paste(lib$Variable,lib$file,sep="-")
+#   lib2$dum<-paste(lib2$Variable,lib2$file,sep="-")
+#
+#   rem<-lib2[lib2$change.name=="remove",]
+#   unch<-lib2[lib2$change.name=="unchanged",]
+#   rnm<-lib2[!lib2$change.name%in%c("unchanged","remove"),]
+#
+# lib3<-lib[!lib$dum%in%rem$dum,]
+# lib3$Variable[lib3$dum%in%rnm$dum]<-rnm$change.name[rnm$dum%in%lib3$dum]
+#
+# for(i in unique(lib2$file)){
+#   dc<-read.csv(paste0("./input/",i))
+#   rem1<-rem[rem$file==i,]
+#   rnm1<-rnm[rnm$file==i,]
+#   names(dc)<-toupper(names(dc))
+#   ind<-!names(dc)%in%rem1$Variable
+#   dc<-dc[,ind]
+#   names(dc)[names(dc)%in%rnm1$Variable]<-rnm1$change.name
+#     write.csv(dc,paste0("./input/",i),row.names=F)}
+#     write.csv(lib3,"studydefinelist.csv",row.names=F)
+#   }
+
 #' Step 3
-#'Optional. Run this option to apply the changes to label name or lable removal.
-#' @keywords step3
-#' @export
-#' @examples
-#' step3()
-
-step3<-function(){
-  setwd(working.folder)
-  lib<-read.csv("studydefinelist.csv",stringsAsFactors=F)
-  filename = paste("./Backup/Original_studydefinelist-",format(Sys.time(), "%a-%b-%d-%H-%M-%S-%Y"),sep="")
-  write.csv(lib,paste0(filename,".csv"))
-  lib2<-read.csv("Var_name_GT8.csv",stringsAsFactors=F)
-  lib2<-chclass(lib2,names(lib2),"char")
-  lib2$change.name[is.na(lib2$change.name)|lib2$change.name==""]<-"unchanged"
-  lib$dum<-paste(lib$Variable,lib$file,sep="-")
-  lib2$dum<-paste(lib2$Variable,lib2$file,sep="-")
-
-  rem<-lib2[lib2$change.name=="remove",]
-  unch<-lib2[lib2$change.name=="unchanged",]
-  rnm<-lib2[!lib2$change.name%in%c("unchanged","remove"),]
-
-lib3<-lib[!lib$dum%in%rem$dum,]
-lib3$Variable[lib3$dum%in%rnm$dum]<-rnm$change.name[rnm$dum%in%lib3$dum]
-
-for(i in unique(lib2$file)){
-  dc<-read.csv(paste0("./input/",i))
-  rem1<-rem[rem$file==i,]
-  rnm1<-rnm[rnm$file==i,]
-  names(dc)<-toupper(names(dc))
-  ind<-!names(dc)%in%rem1$Variable
-  dc<-dc[,ind]
-  names(dc)[names(dc)%in%rnm1$Variable]<-rnm1$change.name
-    write.csv(dc,paste0("./input/",i),row.names=F)}
-    write.csv(lib3,"studydefinelist.csv",row.names=F)
-  }
-
-#' Step 4
 #'
 #' Convert csv to xpt and create define document
 #' @param logo Add logo by copying logo.jpg to the main working folderfirst time package user, run this function to install all required packages.
@@ -975,11 +965,11 @@ for(i in unique(lib2$file)){
 #' @param style Load document style by copying word template and rename as style.docx to the main working folder.
 #' Can be downloaded from my Github
 #' @param title Project title
-#' @keywords step4
+#' @keywords step3
 #' @export
 #' @examples
 #' step4(title="Add title here")
-step4<-function(project_title="Project Title",xpt_location="./",prog_location="../programs/",define_location="./output/datasets/",
+step3<-function(project_title="Project Title",xpt_location="./",prog_location="../programs/",define_location="./output/datasets/",
                 range_character="yes"){
   class="auto"
   generateXPT(range.character=range_character)

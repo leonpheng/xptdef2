@@ -4,7 +4,7 @@
 \alias{step1}
 \title{step1}
 \usage{
-step1(working.folder)
+step1()
 }
 \arguments{
 \item{working.folder}{mandatory. ex:working.folder<-"C:/Users/lpheng/Desktop/xptdefine".}

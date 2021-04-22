@@ -2,16 +2,29 @@
 % Please edit documentation in R/package.R
 \name{step3}
 \alias{step3}
-\title{Step 3
-Optional. Run this option to apply the changes to label name or lable removal.}
+\title{Step 3}
 \usage{
-step3()
+step3(
+  project_title = "Project Title",
+  xpt_location = "./",
+  prog_location = "../programs/",
+  define_location = "./output/datasets/",
+  range_character = "yes"
+)
+}
+\arguments{
+\item{logo}{Add logo by copying logo.jpg to the main working folderfirst time package user, run this function to install all required packages.
+Can be downloaded from my Github}
+
+\item{style}{Load document style by copying word template and rename as style.docx to the main working folder.
+Can be downloaded from my Github}
+
+\item{title}{Project title}
 }
 \description{
-Step 3
-Optional. Run this option to apply the changes to label name or lable removal.
+Convert csv to xpt and create define document
 }
 \examples{
-step3()
+step4(title="Add title here")
 }
 \keyword{step3}
