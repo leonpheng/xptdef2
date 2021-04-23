@@ -29,7 +29,7 @@ ipak <- function(pkg){
 #' install.packages()
 
 install.packages<-function(...){
-  packages <- c("SASxport", "reshape", "Hmisc", "tidyr","ReporteRs","plyr","downloader")
+  packages <- c("SASxport", "reshape", "Hmisc", "tidyr","plyr","downloader")
   ipak(packages)
 
   require(downloader)
@@ -263,16 +263,17 @@ definelist<-function(...){
   lib1<-lib#plyr::join(var,lib)
   #lib1$"SAS.label"<-lib1$"Enter.label.here"
   lib1$"Max.40.char"<-nchar(as.character(lib1$"Enter.label.here"))
-lib1$labelsize<-nchar(as.character(lib1$"Variable"))
+lib1$labelsize<-nchar(lib1$Enter.label.here)#nchar(as.character(lib1$"Variable"))
 
 keep<-c("Variable","Unit","Detailed.description","Enter.label.here","Max.40.char","file")
 
 lib1$Variable<-toupper(lib1$Variable)
 lib1$Enter.label.here<-as.character(lib1$Enter.label.here)
+lib1$labelsize<-nchar(lib1$Enter.label.here)
 lib1$ISSUE<-""
-lib1$ISSUE<-ifelse(nchar(lib1$Variable)>8,"Issue#1:VarName>8",lib1$ISSUE)
-lib1$ISSUE<-ifelse(nchar(lib1$Enter.label.here)>40,paste(lib1$ISSUE,"Issue#2:","Label>40"),lib1$ISSUE)
-lib1$ISSUE<-ifelse(is.na(lib1$Enter.label.here),"Issue#3:Required information are missing",lib1$ISSUE)
+lib1$ISSUE<-ifelse(nchar(lib1$Variable)>8,"VarName>8",lib1$ISSUE)
+lib1$ISSUE<-ifelse(nchar(lib1$Enter.label.here)>40,paste0(lib1$ISSUE,"; ","Label>40"),lib1$ISSUE)
+lib1$ISSUE<-ifelse(is.na(lib1$Enter.label.here),paste0(lib1$ISSUE,"; Missing label"),lib1$ISSUE)
 lib1$RESOLUTION<-""
 lib1$Max.40.char<-NULL
 #lib2<-lib1[nchar(lib1$Variable)>8,]
@@ -443,7 +444,7 @@ for (j in 1:nrow(inp)){
     #write.csv(dc,paste0("./input/",i),row.names=F)}
     #write.csv(lib3,"studydefinelist.csv",row.names=F)
 ###############
-if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Stopped by missing label. Please update the define list.",lib3[is.na(lib3$Enter.label.here),c("Variable")]))
+if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Error due to missing label. Please update the define list.",lib3[is.na(lib3$Enter.label.here),c("Variable")]))
 
       detail<-lib3
       pkdata<-dc
@@ -483,7 +484,7 @@ if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Stopped by missing la
     if(length(ind[!is.na(ind)])>0){
       rgd<-rangepkdat
     for(i in 1:length(ind)){
-        x<-ifelse(length(unique(data[,ind[i]]))>5,paste(paste(as.character(unique(data[,ind[i]])[1:5]),collapse=", ",sep=""),",..."),paste(as.character(unique(data[,ind[i]])),collapse=", ",sep=""))
+        x<-ifelse(length(unique(data[,ind[i]]))>5,paste0(paste(as.character(unique(data[,ind[i]])[1:5]),collapse=", ",sep=""),", ..."),paste(as.character(unique(data[,ind[i]])),collapse=", ",sep=""))
         rgd[ind[i],"Code/Range"]<-x}}else{rgd<-rangepkdat}
     if(!is.null(range.character)){
       write.csv(rgd,paste(inp$outp[j],"define.csv",sep=""),row.names=F)}else{
@@ -602,8 +603,8 @@ tabn<-c("Dataset", "Original Name",   "Description",     "Key Variables",    "Lo
     tab[i,5] = pot( hyp0[i], hyperlink = hyp11,
                     textBold( color = '#0000EE', underline = F ) ) }
 
-  if("logo.jpg"%in%dir("c:/lhtemplate")){
-    doc<-doc%>%addImage("c:/lhtemplate/logo.jpg", par.properties = parProperties(text.align = "center"),width = 3.35, height = 1.6)
+  if("logo.png"%in%dir("c:/lhtemplate")){
+    doc<-doc%>%addImage("c:/lhtemplate/logo.png", par.properties = parProperties(text.align = "center"),width = 3.35, height = 1.6)
   }
 
   doc<-doc %>%
@@ -870,7 +871,7 @@ helps<-function(...){
                             "define.library= path/libraryfile.csv",
                             "step2()",
                             "EDIT studydefinelist.csv and save.",
-                            "step4(title)"))
+                            "step3(title)"))
   print(x)
 }
 
