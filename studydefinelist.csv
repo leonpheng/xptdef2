@@ -1,0 +1,316 @@
+Variable,Unit,Detailed.description,Enter.label.here,file,labelsize,ISSUE,RESOLUTION
+X,,X,X,etaammb.csv,1,,remove
+SCENARIO,,SCENARIO (not used),SCENARIO,etaammb.csv,8,,remove
+ID,,Unique Subject ID,Unique Subject ID,etaammb.csv,17,,
+NENDOAMM,,Individual random effect of ENDO for AMM,Individual random effect of ENDO for AMM,etaammb.csv,40,,
+NCLAMM,,Individual random effect of CL for AMM,Individual random effect of CL for AMM,etaammb.csv,38,,
+NVAMM,,Individual random effect of V for AMM,Individual random effect of V for AMM,etaammb.csv,37,,
+NEMAXORN,,Individual random effect of Emax for ORN,Individual random effect of Emax for ORN,etaammb.csv,40,,
+NORN50,,Individual random effect of EC50 for ORN,Individual random effect of EC50 for ORN,etaammb.csv,40,,
+NEMAXPAA,,Individual random effect of Emax for PAA,Individual random effect of Emax for PAA,etaammb.csv,40,,
+NPAA50,,Individual random effect of EC50 for PAA,Individual random effect of EC50 for PAA,etaammb.csv,40,,
+NENDOAMM_SHRINKAGE,,Shrinkage of ETA ENDO for AMM ,Shrinkage of ETA ENDO for AMM ,etaammb.csv,28,VarName>8,SENDOAMM
+NCLAMM_SHRINKAGE,,Shrinkage of ETA CL for AMM ,Shrinkage of ETA CL for AMM ,etaammb.csv,28,VarName>8,SCLAMM
+NVAMM_SHRINKAGE,,Shrinkage of ETA V for AMM ,Shrinkage of ETA V for AMM ,etaammb.csv,27,VarName>8,SVAMM
+NEMAXORN_SHRINKAGE,,Shrinkage of ETA Emax for ORN,Shrinkage of ETA Emax for ORN,etaammb.csv,29,VarName>8,SEMAXORN
+NORN50_SHRINKAGE,,Shrinkage of ETA EC50 for ORN,Shrinkage of ETA EC50 for ORN,etaammb.csv,29,VarName>8,SORN50
+NEMAXPAA_SHRINKAGE,,Shrinkage of ETA Emax for PAA,Shrinkage of ETA Emax for PAA,etaammb.csv,29,VarName>8,SEMAXPAA
+NPAA50_SHRINKAGE,,Shrinkage of ETA EC50 for PAA,Shrinkage of ETA EC50 for PAA,etaammb.csv,29,VarName>8,SPAA50
+X,,X,X,etaammf.csv,1,,remove
+SCENARIO,,SCENARIO (not used),SCENARIO,etaammf.csv,8,,remove
+ID,,Unique Subject ID,Unique Subject ID,etaammf.csv,17,,
+NENDOAMM,,Individual random effect of ENDO for AMM,Individual random effect of ENDO for AMM,etaammf.csv,40,,
+NCLAMM,,Individual random effect of CL for AMM,Individual random effect of CL for AMM,etaammf.csv,38,,
+NVAMM,,Individual random effect of V for AMM,Individual random effect of V for AMM,etaammf.csv,37,,
+NEMAXORN,,Individual random effect of Emax for ORN,Individual random effect of Emax for ORN,etaammf.csv,40,,
+NORN50,,Individual random effect of EC50 for ORN,Individual random effect of EC50 for ORN,etaammf.csv,40,,
+NEMAXPAA,,Individual random effect of Emax for PAA,Individual random effect of Emax for PAA,etaammf.csv,40,,
+NPAA50,,Individual random effect of EC50 for PAA,Individual random effect of EC50 for PAA,etaammf.csv,40,,
+NENDOAMM_SHRINKAGE,,Shrinkage of ETA ENDO for AMM ,Shrinkage of ETA ENDO for AMM ,etaammf.csv,28,VarName>8,SENDOAMM
+NCLAMM_SHRINKAGE,,Shrinkage of ETA CL for AMM ,Shrinkage of ETA CL for AMM ,etaammf.csv,28,VarName>8,SCLAMM
+NVAMM_SHRINKAGE,,Shrinkage of ETA V for AMM ,Shrinkage of ETA V for AMM ,etaammf.csv,27,VarName>8,SVAMM
+NEMAXORN_SHRINKAGE,,Shrinkage of ETA Emax for ORN,Shrinkage of ETA Emax for ORN,etaammf.csv,29,VarName>8,SEMAXORN
+NORN50_SHRINKAGE,,Shrinkage of ETA EC50 for ORN,Shrinkage of ETA EC50 for ORN,etaammf.csv,29,VarName>8,SORN50
+NEMAXPAA_SHRINKAGE,,Shrinkage of ETA Emax for PAA,Shrinkage of ETA Emax for PAA,etaammf.csv,29,VarName>8,SEMAXPAA
+NPAA50_SHRINKAGE,,Shrinkage of ETA EC50 for PAA,Shrinkage of ETA EC50 for PAA,etaammf.csv,29,VarName>8,SPAA50
+X,,X,X,etaornb.csv,1,,remove
+SCENARIO,,SCENARIO (not used),SCENARIO,etaornb.csv,8,,remove
+ID,,Unique Subject ID,Unique Subject ID,etaornb.csv,17,,
+NENDO,,Individual random effect of Endo,Individual random effect of Endo,etaornb.csv,32,,
+NTK0,,Individual random effect of TK0,Individual random effect of TK0,etaornb.csv,31,,
+NCL,,Individual random effect of CL,Individual random effect of CL,etaornb.csv,30,,
+NV,,Individual random effect of V,Individual random effect of V,etaornb.csv,29,,
+NTLAG,,Individual random effect of Tlag,Individual random effect of Tlag,etaornb.csv,32,,
+NENDO_SHRINKAGE,,Shrinkage of ETA Endo,Shrinkage of ETA Endo,etaornb.csv,21,VarName>8,SENDO
+NTK0_SHRINKAGE,,Shrinkage of ETA TK0,Shrinkage of ETA TK0,etaornb.csv,20,VarName>8,STK0
+NCL_SHRINKAGE,,Shrinkage of ETAT CL,Shrinkage of ETAT CL,etaornb.csv,20,VarName>8,SCL
+NV_SHRINKAGE,,Shrinkage of ETA V,Shrinkage of ETA V,etaornb.csv,18,VarName>8,SV
+NTLAG_SHRINKAGE,,Shrinkage of ETAT Tlag,Shrinkage of ETAT Tlag,etaornb.csv,22,VarName>8,STLAG
+X,,X,X,etaornf.csv,1,,remove
+SCENARIO,,SCENARIO (not used),SCENARIO,etaornf.csv,8,,remove
+ID,,Unique Subject ID,Unique Subject ID,etaornf.csv,17,,
+NENDO,,Individual random effect of Endo,Individual random effect of Endo,etaornf.csv,32,,
+NTK0,,Individual random effect of TK0,Individual random effect of TK0,etaornf.csv,31,,
+NCL,,Individual random effect of CL,Individual random effect of CL,etaornf.csv,30,,
+NV,,Individual random effect of V,Individual random effect of V,etaornf.csv,29,,
+NTLAG,,Individual random effect of Tlag,Individual random effect of Tlag,etaornf.csv,32,,
+NENDO_SHRINKAGE,,Shrinkage of ETA Endo,Shrinkage of ETA Endo,etaornf.csv,21,VarName>8,SENDO
+NTK0_SHRINKAGE,,Shrinkage of ETA TK0,Shrinkage of ETA TK0,etaornf.csv,20,VarName>8,STK0
+NCL_SHRINKAGE,,Shrinkage of ETAT CL,Shrinkage of ETAT CL,etaornf.csv,20,VarName>8,SCL
+NV_SHRINKAGE,,Shrinkage of ETA V,Shrinkage of ETA V,etaornf.csv,18,VarName>8,SV
+NTLAG_SHRINKAGE,,Shrinkage of ETAT Tlag,Shrinkage of ETAT Tlag,etaornf.csv,22,VarName>8,STLAG
+X,,X,X,etapaab.csv,1,,remove
+SCENARIO,,SCENARIO (not used),SCENARIO,etapaab.csv,8,,remove
+ID,,Unique Subject ID,Unique Subject ID,etapaab.csv,17,,
+NV,,Individual random effect of V,Individual random effect of V,etapaab.csv,29,,
+NTK0,,Individual random effect of TK0,Individual random effect of TK0,etapaab.csv,31,,
+NKM,,Individual random effect of KM,Individual random effect of KM,etapaab.csv,30,,
+NVMAX,,Individual random effect of Vmax,Individual random effect of Vmax,etapaab.csv,32,,
+NV2,,Individual random effect of V2,Individual random effect of V2,etapaab.csv,30,,
+NCL2,,Individual random effect of CL2,Individual random effect of CL2,etapaab.csv,31,,
+NTLAG,,Individual random effect of Tlag,Individual random effect of Tlag,etapaab.csv,32,,
+NV_SHRINKAGE,,Shrinkage of ETA V,Shrinkage of ETA V,etapaab.csv,18,VarName>8,SV
+NTK0_SHRINKAGE,,Shrinkage of ETA TK0,Shrinkage of ETA TK0,etapaab.csv,20,VarName>8,STK0
+NKM_SHRINKAGE,,Shrinkage of ETAT of KM,Shrinkage of ETAT of KM,etapaab.csv,23,VarName>8,SKM
+NVMAX_SHRINKAGE,,Shrinkage of ETAT of Vmax,Shrinkage of ETAT of Vmax,etapaab.csv,25,VarName>8,SVMAX
+NV2_SHRINKAGE,,Shrinkage of ETAT of V2,Shrinkage of ETAT of V2,etapaab.csv,23,VarName>8,SV2
+NCL2_SHRINKAGE,,Shrinkage of ETAT of CL2,Shrinkage of ETAT of CL2,etapaab.csv,24,VarName>8,SCL2
+NTLAG_SHRINKAGE,,Shrinkage of ETAT Tlag,Shrinkage of ETAT Tlag,etapaab.csv,22,VarName>8,STLAG
+X,,X,X,etapaaf.csv,1,,remove
+SCENARIO,,SCENARIO (not used),SCENARIO,etapaaf.csv,8,,remove
+ID,,Unique Subject ID,Unique Subject ID,etapaaf.csv,17,,
+NV,,Individual random effect of V,Individual random effect of V,etapaaf.csv,29,,
+NTK0,,Individual random effect of TK0,Individual random effect of TK0,etapaaf.csv,31,,
+NKM,,Individual random effect of KM,Individual random effect of KM,etapaaf.csv,30,,
+NVMAX,,Individual random effect of Vmax,Individual random effect of Vmax,etapaaf.csv,32,,
+NV2,,Individual random effect of V2,Individual random effect of V2,etapaaf.csv,30,,
+NCL2,,Individual random effect of CL2,Individual random effect of CL2,etapaaf.csv,31,,
+NTLAG,,Individual random effect of Tlag,Individual random effect of Tlag,etapaaf.csv,32,,
+NV_SHRINKAGE,,Shrinkage of ETA V,Shrinkage of ETA V,etapaaf.csv,18,VarName>8,SV
+NTK0_SHRINKAGE,,Shrinkage of ETA TK0,Shrinkage of ETA TK0,etapaaf.csv,20,VarName>8,STK0
+NKM_SHRINKAGE,,Shrinkage of ETAT of KM,Shrinkage of ETAT of KM,etapaaf.csv,23,VarName>8,SKM
+NVMAX_SHRINKAGE,,Shrinkage of ETAT of Vmax,Shrinkage of ETAT of Vmax,etapaaf.csv,25,VarName>8,SVMAX
+NV2_SHRINKAGE,,Shrinkage of ETAT of V2,Shrinkage of ETAT of V2,etapaaf.csv,23,VarName>8,SV2
+NCL2_SHRINKAGE,,Shrinkage of ETAT of CL2,Shrinkage of ETAT of CL2,etapaaf.csv,24,VarName>8,SCL2
+NTLAG_SHRINKAGE,,Shrinkage of ETAT Tlag,Shrinkage of ETAT Tlag,etapaaf.csv,22,VarName>8,STLAG
+ID,,Unique Subject ID,Unique Subject ID,pkdatset.csv,17,,
+RECN,,Row Id (1 to N),Row Id,pkdatset.csv,6,,
+RTIME,h,Actual time since first record (h),Actual time since first record (h),pkdatset.csv,34,,
+TAFD,h,Actual time since first dose (h),Actual time since first dose (h),pkdatset.csv,32,,
+TAD,h,Actual time since last dose (h),Actual time since last dose (h),pkdatset.csv,31,,
+AMT,g,Actual dose (g),Actual dose (g),pkdatset.csv,15,,
+RATE0,,"Infusion rate used for a zero order absorption (RATE0=-2: infusion duration should be estimated during modeling for dosing row (EVID=1), else RATE0=""."")",Inf rate for a zero order absorption,pkdatset.csv,36,,
+RATE1,,"Infusion rate used for a first order absorption (RATE1=0: bolus dose (used for first order absorption in the depot compartment) for dosing row (EVID=1), else RATE1=""."")",Inf rate for a first order absorption,pkdatset.csv,37,,
+DVID,,"Dependent variable identifier (DVID=0 used for dose, DVID=1 used for ORN, DVID=2 for PAA)",Dependent variable identifier,pkdatset.csv,29,,
+DV,µg/mL,"Dependent variable (µg/mL), if BLQ = 1 DV is set to 0",Dependent variable (µg/mL),pkdatset.csv,26,,
+MDV,,Missing Dependent Variable,Missing Dependent Variable,pkdatset.csv,26,,
+EVID,,Event Identification (EVID: 0=observation; 1=dose.),Event Identification,pkdatset.csv,20,,
+BLQ,,"Flag for equal or below LOQ (BLQ = 1 for PK measurements equal or below the Lower Limit of Quantification, else 0)",Flag for equal or below LLOQ,pkdatset.csv,27,,
+LLOQ,µg/mL,Lower limit of quantification (µg/mL),Lower limit of quantification (µg/mL),pkdatset.csv,37,,
+AGE,year,Age (year) at baseline,Age (year) at baseline,pkdatset.csv,22,,
+SEX,,Sex (0=female; 1=male),Sex,pkdatset.csv,3,,
+WTKG,kg,Weight (kg) at baseline,Weight (kg) at baseline,pkdatset.csv,23,,
+BMI,kg/m^2,Body mass index (kg/m^2) at baseline,Body mass index (kg/m^2) at baseline,pkdatset.csv,36,,
+CHILDPUGH,,Child Pugh Score at baseline at baseline (CHILDPUGH=1 is Class A - Mild liver disease; CHILDPUGH=2 is Class B - Moderate liver disease; CHILDPUGH=3 is Class C - Severe liver disease.),Child Pugh Score at baseline at baseline,pkdatset.csv,40,VarName>8,CHPUGHN
+CRCL,mL/min,Creatinine clearance (mL/min) at baseline,Creatinine clearance (mL/min) at BL,pkdatset.csv,35,,
+RACE,,Race (0=White; 1=other; 2=Black or African American; 3=American Indian/Alaskan Native.),Race,pkdatset.csv,4,,
+ETHNICITY,,Ethnicity (0=Not Hispanic or Latino; 1=Hispanic or Latino.),Ethnicity,pkdatset.csv,9,VarName>8,ETHNICN
+DOSE,g,Dose (g),Dose (g),pkdatset.csv,8,,
+VOMIT,,"Vomited within 30 minutes of the dose (1=Vomited within 30 minutes of the dose, else 0.)",Vomited within 30 minutes of the dose,pkdatset.csv,37,,
+LACTULOSE,,Lactulose concomitant medication (0=no lactulose; 1=lactulose.),Lactulose concomitant medication,pkdatset.csv,32,VarName>8,LACTULOS
+DLACDOSE,mL,Daily lactulose dose (mL),Daily lactulose dose (mL),pkdatset.csv,25,,
+NTAB,,Number of tablet administrated per dose (2;4;7),Number of tablet administrated per dose,pkdatset.csv,39,,
+NDOSE,,Number of daily dose (2=BID; 3=TID.),Number of daily dose,pkdatset.csv,20,,
+HTCM,cm,Height (cm) at baseline,Height (cm) at baseline,pkdatset.csv,23,,
+CREAT,mg/dL,Creatinine (mg/dL),Creatinine (mg/dL),pkdatset.csv,18,,
+FED,,Treatment administrated under fed condition (0=Fasted; 1=Fed),Treatment admin under fed condition,pkdatset.csv,35,,
+TREAT,,Treatment number (1=A; 2=B; 3=C; 5=E; 6=F; 7=G.),Treatment number,pkdatset.csv,16,,
+STUDYN,,Study number (1=OCR002-SP103; 2=MNK61062107.),Study number,pkdatset.csv,12,,
+EVENING,,"Evening Dose, i.e. dose after 17h00  (1 = Evening dose, 0 not evening dose)",Evening Dose,pkdatset.csv,12,,
+STUDYID,,Study identifier (OCR002-SP103; MNK61062107.),Study identifier,pkdatset.csv,16,,
+USUBJID,,Unique subject identifier,Unique subject identifier,pkdatset.csv,25,,
+PARAMCD,,"Parameter code (""ORN""; ""PAA""; ""DOSE"")",Parameter code,pkdatset.csv,14,,
+DATETIME,,Date time of dose or sample (yyyy-mm-dd hh:mm:ss),Date time of dose or sample,pkdatset.csv,27,,
+SEXC,,Sex as character (F=female; M=male),Sex as character,pkdatset.csv,16,,
+CHILDPUGHC,,"Child Pugh Score text at baseline   (""Class A - Mild liver disease""; ""Class B - Moderate liver disease""; ""Class C - Severe liver disease"".)",Child Pugh Score at baseline,pkdatset.csv,28,VarName>8,CHPUGHC
+RACEC,,"Race text (""WHITE""; ""OTHER""; ""BLACK OR AFRICAN AMERICAN""; ""AMERICAN INDIAN OR ALASKA NATIVE"".)",Race text,pkdatset.csv,9,,
+ETHNICITYC,,"Ethnicity text (""NOT HISPANIC OR LATINO""; ""HISPANIC OR LATINO"".)",Ethnicity text,pkdatset.csv,14,VarName>8,ETHNICC
+TREATC,,"Treatment character (""A""; ""B""; ""C""; ""E""; ""F""; ""G"".)",Treatment character,pkdatset.csv,19,,
+TREATS,,"Treatment string (A=""MNK6106 6 g (2 tablets TID) for 5 days (30 g total dose)""; B=""MNK6106 8 g (4 tablets BID) for 5 days (40 g total dose)""; C=""MNK6106 12 g (4 tablets TID) for 5 days (60 g total dose)""; E=""OCR-002 6g (2 tablets TID)""; F=""OCR-002 12g (4 tablets TID)""; G=""OCR-002 21g (7 tablets TID)"".)",Treatment string,pkdatset.csv,16,,
+NDOSEC,,"Number of daily dose text (""BID""; ""TID"".)",Number of daily dose text,pkdatset.csv,25,,
+FEDC,,"Treatment administrated under fed condition text (""Fed"")",Treatment admin under fed condition,pkdatset.csv,35,,
+VISIT,,Visit,Visit,pkdatset.csv,5,,
+ID,,Unique Subject ID,Unique Subject ID,pkpddatset.csv,17,,
+RECN,,Row Id (1 to N),Row Id,pkpddatset.csv,6,,
+RTIME,h,Actual time since first record (h),Actual time since first record (h),pkpddatset.csv,34,,
+TAFD,h,Actual time since first dose (h),Actual time since first dose (h),pkpddatset.csv,32,,
+TAD,h,Actual time since last dose (h),Actual time since last dose (h),pkpddatset.csv,31,,
+MDV,,Missing Dependent Variable,Missing Dependent Variable,pkpddatset.csv,26,,
+EVID,,Event Identification (EVID: 0=observation; 1=dose.),Event Identification,pkpddatset.csv,20,,
+A1,g,ORN actual dose (g),ORN actual dose (g),pkpddatset.csv,19,,
+A2,g,PAA actual dose (g),PAA actual dose (g),pkpddatset.csv,19,,
+COBS,µmol/L,"Dependent variable (µmol/L), if CObsBQL = 1, CObs is set to LLOQ",Dependent variable (µmol/L),pkpddatset.csv,27,,
+COBSBQL,,"Flag for equal or below LOQ (CObsBQL = 1 for Ammonia measurements below the Lower Limit of Quantification, else 0)",Flag for equal or below LLOQ,pkpddatset.csv,27,,
+DOSE,g,Dose (g),Dose (g),pkpddatset.csv,8,,
+VOMIT,,"Vomited within 30 minutes of the dose (1=Vomited within 30 minutes of the dose, else 0.)",Vomited within 30 minutes of the dose,pkpddatset.csv,37,,
+DLACDOSE,mL,Daily lactulose dose (mL),Daily lactulose dose (mL),pkpddatset.csv,25,,
+NTAB,,Number of tablet administrated per dose (2;4;7),Number of tablet administrated per dose,pkpddatset.csv,39,,
+NDOSE,,Number of daily dose (2=BID; 3=TID.),Number of daily dose,pkpddatset.csv,20,,
+FED,,Treatment administrated under fed condition (0=Fasted; 1=Fed),Treatment admin under fed condition,pkpddatset.csv,35,,
+TREAT,,Treatment number (1=A; 2=B; 3=C; 5=E; 6=F; 7=G.),Treatment number,pkpddatset.csv,16,,
+EVENING,,"Evening Dose, i.e. dose after 17h00  (1 = Evening dose, 0 not evening dose)",Evening Dose,pkpddatset.csv,12,,
+AGE,year,Age (year) at baseline,Age (year) at baseline,pkpddatset.csv,22,,
+SEX,,Sex (0=female; 1=male),Sex,pkpddatset.csv,3,,
+WTKG,kg,Weight (kg) at baseline,Weight (kg) at baseline,pkpddatset.csv,23,,
+BMI,kg/m^2,Body mass index (kg/m^2) at baseline,Body mass index (kg/m^2) at baseline,pkpddatset.csv,36,,
+CHILDPUGH,,Child Pugh Score at baseline at baseline (CHILDPUGH=1 is Class A - Mild liver disease; CHILDPUGH=2 is Class B - Moderate liver disease; CHILDPUGH=3 is Class C - Severe liver disease.),Child Pugh Score at baseline at baseline,pkpddatset.csv,40,VarName>8,CHPUGHN
+CRCL,mL/min,Creatinine clearance (mL/min) at baseline,Creatinine clearance (mL/min) at BL,pkpddatset.csv,35,,
+RACE,,Race (0=White; 1=other; 2=Black or African American; 3=American Indian/Alaskan Native.),Race,pkpddatset.csv,4,,
+ETHNICITY,,Ethnicity (0=Not Hispanic or Latino; 1=Hispanic or Latino.),Ethnicity,pkpddatset.csv,9,VarName>8,ETHNICN
+LACTULOSE,,Lactulose concomitant medication (0=no lactulose; 1=lactulose.),Lactulose concomitant medication,pkpddatset.csv,32,VarName>8,LACTULOS
+HTCM,cm,Height (cm) at baseline,Height (cm) at baseline,pkpddatset.csv,23,,
+CREAT,mg/dL,Creatinine (mg/dL),Creatinine (mg/dL),pkpddatset.csv,18,,
+STUDYN,,Study number (1=OCR002-SP103; 2=MNK61062107.),Study number,pkpddatset.csv,12,,
+BASE,µmol/L,Baseline Ammonia (µmol/L) (Ammonia sample just before the first dose),Baseline Ammonia (µmol/L),pkpddatset.csv,24,,
+MAXAMM,µmol/L,Maximum measured Ammonia (µmol/L),Maximum measured Ammonia (µmol/L),pkpddatset.csv,31,,
+MAXPREAMM,µmol/L,Maximum predose measured Ammonia (µmol/L),Max predose measured Ammonia (µmol/L),pkpddatset.csv,35,VarName>8,MXPREAMM
+ENDOORN,mg/h,"ORN PK parameter Endo/F, apparent endogenuous ORN production (mg/h)",ORN apparent endog production (mg/h),pkpddatset.csv,36,,
+TLAGORN,h,"ORN PK parameter Tlag, ORN lag time (h)","ORN PK parameter Tlag, ORN lag time (h)",pkpddatset.csv,39,,
+TK0ORN,h,"ORN PK parameter Tk0, ORN duration of zero order absorption rate (h)",ORN dur of zero order absorp rate (h),pkpddatset.csv,37,,
+CLORN,L/h,"ORN PK parameter CL/F, ORN apparent clearance (L/h)",ORN apparent clearance (L/h),pkpddatset.csv,28,,
+VORN,L,"ORN PK parameter Vc/F, ORN apparent volume of central compartment (L)",ORN apparent central volum of dist. (L),pkpddatset.csv,39,,
+FRELPAA,,"PAA PK parameter Frel, PAA realtive bioavailability",PAA realtive bioavailability,pkpddatset.csv,28,,
+TLAGPAA,h,"PAA PK parameter Tlag, PAA lag time (h)","PAA PK parameter Tlag, PAA lag time (h)",pkpddatset.csv,39,,
+TK0PAA,h,"PAA PK parameter Tk0, PAA duration of zero order absorption rate (h)",PAA dur of zero order absorp rate (h),pkpddatset.csv,37,,
+VMAXPAA,mg/h,"PAA PK parameter Vmax, PAA maximum velocity (mg/h)",PAA maximum velocity (mg/h),pkpddatset.csv,27,,
+KMPAA,mg/L,"PAA PK parameter Km, PAA concentrations at 50% of Vmax (mg/L)",PAA concentrations at 50% of Vmax (mg/L),pkpddatset.csv,40,,
+VPAA,L,"PAA PK parameter Vc/F, PAA apparent volume of central compartment (L)",PAA apparent central volume of dist. (L),pkpddatset.csv,39,,
+CL2PAA,L/h,"PAA PK parameter CLd/F, PAA apparent clearance od distribution (L/h)",PAA app inter comp transfer rate (L/h),pkpddatset.csv,38,,
+V2PAA,L,"PAA PK parameter Vp/F, PAA apparent volume of peripheral compartment (L)",PAA apparent volume of perip comptm (L),pkpddatset.csv,39,,
+STUDYID,,Study identifier (OCR002-SP103; MNK61062107.),Study identifier,pkpddatset.csv,16,,
+USUBJID,,Unique subject identifier,Unique subject identifier,pkpddatset.csv,25,,
+VISIT,,Visit,Visit,pkpddatset.csv,5,,
+DATETIME,,Date time of dose or sample (yyyy-mm-dd hh:mm:ss),Date time of dose or sample,pkpddatset.csv,27,,
+PARAM,,"Parameter code (""Ammonia (umol/L)"", ""Ammonia (umol/L) ;Central"", ""Ammonia (umol/L) ;Local"", ""Dose"")",Parameter code,pkpddatset.csv,14,,
+TREATC,,"Treatment character (""A""; ""B""; ""C""; ""E""; ""F""; ""G"".)",Treatment character,pkpddatset.csv,19,,
+TREATS,,"Treatment string (A=""MNK6106 6 g (2 tablets TID) for 5 days (30 g total dose)""; B=""MNK6106 8 g (4 tablets BID) for 5 days (40 g total dose)""; C=""MNK6106 12 g (4 tablets TID) for 5 days (60 g total dose)""; E=""OCR-002 6g (2 tablets TID)""; F=""OCR-002 12g (4 tablets TID)""; G=""OCR-002 21g (7 tablets TID)"".)",Treatment string,pkpddatset.csv,16,,
+NDOSEC,,"Number of daily dose text (""BID""; ""TID"".)",Number of daily dose text,pkpddatset.csv,25,,
+FEDC,,"Treatment administrated under fed condition text (""Fed"")",Treatment admin under fed condition,pkpddatset.csv,35,,
+SEXC,,Sex as character (F=female; M=male),Sex as character,pkpddatset.csv,16,,
+CHILDPUGHC,,"Child Pugh Score text at baseline   (""Class A - Mild liver disease""; ""Class B - Moderate liver disease""; ""Class C - Severe liver disease"".)",Child Pugh Score at baseline,pkpddatset.csv,28,VarName>8,CHPUGHC
+RACEC,,"Race text (""WHITE""; ""OTHER""; ""BLACK OR AFRICAN AMERICAN""; ""AMERICAN INDIAN OR ALASKA NATIVE"".)",Race text,pkpddatset.csv,9,,
+ETHNICITYC,,"Ethnicity text (""NOT HISPANIC OR LATINO""; ""HISPANIC OR LATINO"".)",Ethnicity text,pkpddatset.csv,14,VarName>8,ETHNICC
+X,,X,X,resammb.csv,1,,remove
+SCENARIO,,SCENARIO (not used),SCENARIO,resammb.csv,8,,remove
+ID,,Unique Subject ID,Unique Subject ID,resammb.csv,17,,
+IVAR,h,Time after first dose (h),Time after first dose (h),resammb.csv,25,,
+TAD,h,Actual time since last dose (h),Actual time since last dose (h),resammb.csv,31,,
+PRED,log(µmol/L),Population predicted log(concentration),Population predicted log(concentration),resammb.csv,34,,
+IPRED,log(µmol/L),Individual predicted log(concentration),Individual predicted log(concentration),resammb.csv,34,,
+DV,log(µmol/L),Dependent variable log(concentration),Dependent variable log(µmol/L),resammb.csv,26,,
+IRES,,Individual residual,Individual residual,resammb.csv,19,,
+PREDSE,,Standard error of predicted value (all NA),Standard error of predicted value,resammb.csv,33,,remove
+WEIGHT,,Applied model weight,Applied model weight,resammb.csv,20,,
+IWRES,,Individual weighted residual,Individual weighted residual,resammb.csv,28,,
+WRES,,Weighted residual,Weighted residual,resammb.csv,17,,
+CWRES,,Corrected weighted residual,Conditional weighted residual,resammb.csv,27,,
+CDFDV,,Cumulative distribution function for the dependent variable (all 0),Cum distrib funct for dependent variable,resammb.csv,40,,remove
+TADSEQ,,Time after dose sequence,Time after dose sequence,resammb.csv,24,,
+OBSNAME,,Observation Name (all CObs),Observation Name,resammb.csv,16,,remove
+RESETSEQ,,Reset sequence (not used),Reset sequence (not used),resammb.csv,25,,remove
+VAR__INF__FACTOR,,variance inflation factor  (all NA),variance inflation factor ,resammb.csv,26,VarName>8,remove
+X,,X,X,resammf.csv,1,,remove
+SCENARIO,,SCENARIO (not used),SCENARIO,resammf.csv,8,,remove
+ID,,Unique Subject ID,Unique Subject ID,resammf.csv,17,,
+IVAR,h,Time after first dose (h),Time after first dose (h),resammf.csv,25,,
+TAD,h,Actual time since last dose (h),Actual time since last dose (h),resammf.csv,31,,
+PRED,log(µmol/L),Population predicted log(concentration),Population predicted log(concentration),resammf.csv,34,,
+IPRED,log(µmol/L),Individual predicted log(concentration),Individual predicted log(concentration),resammf.csv,34,,
+DV,log(µmol/L),Dependent variable log(concentration),Dependent variable log(µmol/L),resammf.csv,26,,
+IRES,,Individual residual,Individual residual,resammf.csv,19,,
+PREDSE,,Standard error of predicted value (all NA),Standard error of predicted value,resammf.csv,33,,remove
+WEIGHT,,Applied model weight,Applied model weight,resammf.csv,20,,
+IWRES,,Individual weighted residual,Individual weighted residual,resammf.csv,28,,
+WRES,,Weighted residual,Weighted residual,resammf.csv,17,,
+CWRES,,Corrected weighted residual,Conditional weighted residual,resammf.csv,27,,
+CDFDV,,Cumulative distribution function for the dependent variable (all 0),Cum distrib funct for dependent variable,resammf.csv,40,,remove
+TADSEQ,,Time after dose sequence,Time after dose sequence,resammf.csv,24,,
+OBSNAME,,Observation Name (all CObs),Observation Name,resammf.csv,16,,remove
+RESETSEQ,,Reset sequence (not used),Reset sequence (not used),resammf.csv,25,,remove
+VAR__INF__FACTOR,,variance inflation factor  (all NA),variance inflation factor ,resammf.csv,26,VarName>8,remove
+X,,X,X,resornb.csv,1,,remove
+SCENARIO,,SCENARIO (not used),SCENARIO,resornb.csv,8,,remove
+ID,,Unique Subject ID,Unique Subject ID,resornb.csv,17,,
+IVAR,h,Time after first dose (h),Time after first dose (h),resornb.csv,25,,
+TAD,h,Actual time since last dose (h),Actual time since last dose (h),resornb.csv,31,,
+PRED,log(µg/mL),Population predicted log(concentration),Population predicted log(concentration),resornb.csv,34,,
+IPRED,log(µg/mL),Individual predicted log(concentration),Individual predicted log(concentration),resornb.csv,34,,
+DV,log(µg/mL),Dependent variable log(concentration),Dependent variable log(µg/mL),resornb.csv,26,,
+IRES,,Individual residual,Individual residual,resornb.csv,19,,
+PREDSE,,Standard error of predicted value (all NA),Standard error of predicted value,resornb.csv,33,,remove
+WEIGHT,,Applied model weight,Applied model weight,resornb.csv,20,,
+IWRES,,Individual weighted residual,Individual weighted residual,resornb.csv,28,,
+WRES,,Weighted residual,Weighted residual,resornb.csv,17,,
+CWRES,,Corrected weighted residual,Conditional weighted residual,resornb.csv,27,,
+CDFDV,,Cumulative distribution function for the dependent variable (all 0),Cum distrib funct for dependent variable,resornb.csv,40,,remove
+TADSEQ,,Time after dose sequence,Time after dose sequence,resornb.csv,24,,
+OBSNAME,,Observation Name (all CObs),Observation Name,resornb.csv,16,,remove
+RESETSEQ,,Reset sequence (not used),Reset sequence (not used),resornb.csv,25,,remove
+VAR__INF__FACTOR,,variance inflation factor  (all NA),variance inflation factor ,resornb.csv,26,VarName>8,remove
+X,,X,X,resornf.csv,1,,remove
+SCENARIO,,SCENARIO (not used),SCENARIO,resornf.csv,8,,remove
+ID,,Unique Subject ID,Unique Subject ID,resornf.csv,17,,
+IVAR,h,Time after first dose (h),Time after first dose (h),resornf.csv,25,,
+TAD,h,Actual time since last dose (h),Actual time since last dose (h),resornf.csv,31,,
+PRED,log(µg/mL),Population predicted log(concentration),Population predicted log(concentration),resornf.csv,34,,
+IPRED,log(µg/mL),Individual predicted log(concentration),Individual predicted log(concentration),resornf.csv,34,,
+DV,log(µg/mL),Dependent variable log(concentration),Dependent variable log(µg/mL),resornf.csv,26,,
+IRES,,Individual residual,Individual residual,resornf.csv,19,,
+PREDSE,,Standard error of predicted value (all NA),Standard error of predicted value,resornf.csv,33,,remove
+WEIGHT,,Applied model weight,Applied model weight,resornf.csv,20,,
+IWRES,,Individual weighted residual,Individual weighted residual,resornf.csv,28,,
+WRES,,Weighted residual,Weighted residual,resornf.csv,17,,
+CWRES,,Corrected weighted residual,Conditional weighted residual,resornf.csv,27,,
+CDFDV,,Cumulative distribution function for the dependent variable (all 0),Cum distrib funct for dependent variable,resornf.csv,40,,remove
+TADSEQ,,Time after dose sequence,Time after dose sequence,resornf.csv,24,,
+OBSNAME,,Observation Name (all CObs),Observation Name,resornf.csv,16,,remove
+RESETSEQ,,Reset sequence (not used),Reset sequence (not used),resornf.csv,25,,remove
+VAR__INF__FACTOR,,variance inflation factor  (all NA),variance inflation factor ,resornf.csv,26,VarName>8,remove
+X,,X,X,respaab.csv,1,,remove
+SCENARIO,,SCENARIO (not used),SCENARIO,respaab.csv,8,,remove
+ID,,Unique Subject ID,Unique Subject ID,respaab.csv,17,,
+IVAR,h,Time after first dose (h),Time after first dose (h),respaab.csv,25,,
+TAD,h,Actual time since last dose (h),Actual time since last dose (h),respaab.csv,31,,
+PRED,log(µg/mL),Population predicted log(concentration),Population predicted log(concentration),respaab.csv,34,,
+IPRED,log(µg/mL),Individual predicted log(concentration),Individual predicted log(concentration),respaab.csv,34,,
+DV,log(µg/mL),Dependent variable log(concentration),Dependent variable log(µg/mL),respaab.csv,26,,
+IRES,,Individual residual,Individual residual,respaab.csv,19,,
+PREDSE,,Standard error of predicted value (all NA),Standard error of predicted value,respaab.csv,33,,remove
+WEIGHT,,Applied model weight,Applied model weight,respaab.csv,20,,
+IWRES,,Individual weighted residual,Individual weighted residual,respaab.csv,28,,
+WRES,,Weighted residual,Weighted residual,respaab.csv,17,,
+CWRES,,Corrected weighted residual,Conditional weighted residual,respaab.csv,27,,
+CDFDV,,Cumulative distribution function for the dependent variable (all 0),Cum distrib funct for dependent variable,respaab.csv,40,,remove
+TADSEQ,,Time after dose sequence,Time after dose sequence,respaab.csv,24,,
+OBSNAME,,Observation Name (all CObs),Observation Name,respaab.csv,16,,remove
+RESETSEQ,,Reset sequence (not used),Reset sequence (not used),respaab.csv,25,,remove
+VAR__INF__FACTOR,,variance inflation factor  (all NA),variance inflation factor ,respaab.csv,26,VarName>8,remove
+X,,X,X,respaaf.csv,1,,remove
+SCENARIO,,SCENARIO (not used),SCENARIO,respaaf.csv,8,,remove
+ID,,Unique Subject ID,Unique Subject ID,respaaf.csv,17,,
+IVAR,h,Time after first dose (h),Time after first dose (h),respaaf.csv,25,,
+TAD,h,Actual time since last dose (h),Actual time since last dose (h),respaaf.csv,31,,
+PRED,log(µg/mL),Population predicted log(concentration),Population predicted log(concentration),respaaf.csv,34,,
+IPRED,log(µg/mL),Individual predicted log(concentration),Individual predicted log(concentration),respaaf.csv,34,,
+DV,log(µg/mL),Dependent variable log(concentration),Dependent variable log(µg/mL),respaaf.csv,26,,
+IRES,,Individual residual,Individual residual,respaaf.csv,19,,
+PREDSE,,Standard error of predicted value (all NA),Standard error of predicted value,respaaf.csv,33,,remove
+WEIGHT,,Applied model weight,Applied model weight,respaaf.csv,20,,
+IWRES,,Individual weighted residual,Individual weighted residual,respaaf.csv,28,,
+WRES,,Weighted residual,Weighted residual,respaaf.csv,17,,
+CWRES,,Corrected weighted residual,Conditional weighted residual,respaaf.csv,27,,
+CDFDV,,Cumulative distribution function for the dependent variable (all 0),Cum distrib funct for dependent variable,respaaf.csv,40,,remove
+TADSEQ,,Time after dose sequence,Time after dose sequence,respaaf.csv,24,,
+OBSNAME,,Observation Name (all CObs),Observation Name,respaaf.csv,16,,remove
+RESETSEQ,,Reset sequence (not used),Reset sequence (not used),respaaf.csv,25,,remove
+VAR__INF__FACTOR,,variance inflation factor  (all NA),variance inflation factor ,respaaf.csv,26,VarName>8,remove
