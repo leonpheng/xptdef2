@@ -669,7 +669,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
     orin= as.character(inp1$"Original Name"[j])
     struc= as.character(struct[j])
     dts2 <- as.character(inp1$Dataset[j])
-    link1 <- paste0(xpt.location, as.character(inp1$link[j]))#color = "#0000EE"
+    link1 <- paste0(xpt.location, gsub("./","",as.character(inp1$link[j])))#color = "#0000EE"
 
     no_prog<-usedprog[j] == "NA" | usedprog[j] == ""
     if (no_prog) {
