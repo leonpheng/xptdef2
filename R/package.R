@@ -514,9 +514,8 @@ if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Error due to missing 
 #' @export
 #' @examples
 #' generateDEF1()
-
-generateDEF1<-function (title = "Add title here", xpt.location = "./",
-                        prog.location = "../programs/", define.location = "./output/datasets/")
+generateDEF1<-function (title = "Add title here", xpt.location = "./datasets/",
+                        prog.location = "./programs/", define.location = "./output/")
 {
 
   library(officer)
@@ -565,7 +564,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
                                           outdir), ".xpt"), `Original Name` = oriname,
                      Description = description, Keyvariables = key, Datasetfullname = paste0("#datasets#", paste0(sub(".csv", "", outdir), ".xpt")))
   inp1$Original.Name <- gsub(inp1$Original.Name, pattern = "\\_",
-                             replacement = "XXXX")
+                             replacement = "_")
   chclass <- function(data, var, class = "char") {
     for (i in var) {
       if (class == "num") {
@@ -616,31 +615,17 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
   ft<-font(ft, fontname = "Times New Roman", part = "all")
   ft<-set_table_properties(ft, width = .7, layout = "autofit")
 
+  tab<-NULL
+  tab[[1]]<-ft
+  ft<-NULL
+
   #doc<-read_docx()
-  img_in_par <- fpar(
-    external_img(src ="c:/lhtemplate/logo.png",width=3.5,height=1.44),
-    fp_p = fp_par(text.align = "center") )
 
-  text_style <- fp_text(font.size =15,bold=T)
-  par_style <- fp_par(text.align = "center")
-
-  doc<-read_docx("c:/lhtemplate/style.docx")
-  doc <- body_add_fpar(doc,img_in_par)
-  #doc <- body_add_break(doc)
-  an_fpar <- fpar("", run_linebreak())
-  doc <- body_add(doc, an_fpar)
-  doc <- body_add_fpar(doc, fpar( ftext(title, prop = text_style), fp_p = par_style ) )
-  doc <-body_add_break(doc)
-  doc <- body_add_toc(doc,level=2)
-  doc <-body_add_break(doc)
-  doc <- body_add_par(doc,"DATASETS TABLE OF CONTENTS",style = c("heading 1"))
-  doc <- body_add_flextable(doc,ft)
-  doc <-body_add_break(doc)
-  doc <- body_add_par(doc,"VARIABLE DEFINITION TABLES",style = c("heading 1"))
 
   #START LOOP FOR VARIABLE DEFINE LIST
 
   tab1data <- inp
+
   for (j in 1:nrow(inp)) {
     t1<-as.character(tab1data$outp[j])
     doc <- body_add_par(doc,t1,style = c("heading 2"))
@@ -669,7 +654,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
     orin= as.character(inp1$"Original Name"[j])
     struc= as.character(struct[j])
     dts2 <- as.character(inp1$Dataset[j])
-    link1 <- paste0(xpt.location, gsub("./","",as.character(inp1$link[j])))#color = "#0000EE"
+    link1 <- as.character(inp1$link[j])#color = "#0000EE"
 
     no_prog<-usedprog[j] == "NA" | usedprog[j] == ""
     if (no_prog) {
@@ -682,29 +667,29 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
 
     names(tw2)
     #------->header
-    tw2$A<-""
-    tw2$link<-""
-    tw2$A[4:5]<-c(dts2,"")
-    tw2$link[4:5]<-c(link1,"")
+    tw2$B<-""
+    tw2$C<-""
+    tw2$B[4:5]<-c(dts2,"")
+    tw2$C[4:5]<-c(link1,"")
     tw2$SAS.Label[c(1:3)]<-c("",orin,struc)
     tw2$SAS.Label[c(4:5)]<-c(1,"")
 
     if (!no_prog) {
       tw2$SAS.Label[5]<-2
-      tw2$A[5]<-c(prog)
-      tw2$link[5]<-c(link2)
+      tw2$B[5]<-c(prog)
+      tw2$C[5]<-c(link2)
     }
 
-    tw2$A<-as.character(tw2$A)
-    tw2$link<-as.character(tw2$link)
+    tw2$B<-as.character(tw2$B)
+    tw2$C<-as.character(tw2$C)
 
     ft1 <- flextable(data = tw2)
 
     if(no_prog){
-      ft1 <- compose(x = ft1, j=2,i=4, value = multi_hyperlink_text(A,link))
+      ft1 <- compose(x = ft1, j=2,i=4, value = multi_hyperlink_text(B,C))
       ft1 <- color(x = ft1,i=4, j =2,color = "#0000EE")
     }else{
-      ft1 <- compose(x = ft1, j=2,i=4:5, value = multi_hyperlink_text(A,link))
+      ft1 <- compose(x = ft1, j=2,i=4:5, value = multi_hyperlink_text(B,C))
       ft1 <- color(x = ft1,i=4:5, j =2,color = "#0000EE")
     }
 
@@ -713,7 +698,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
     ft1<-bold(ft1,i=4,j=2)
     ft1<-bold(ft1,i=5,j=2)
     ft1 <- delete_part(x = ft1, part = "header")
-    ft1 <- void(x = ft1,~A+link, part = "body")
+    ft1 <- void(x = ft1,~B+C, part = "body")
     for(i in 2:5){
       ft1<-merge_at(ft1,j=2:7,i=i)
     }
@@ -741,9 +726,10 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
 
     ft1<-font(ft1, fontname = "Times New Roman", part = "all")
     ft1<-set_table_properties(ft1, width = .7, layout = "autofit")
-    doc <- body_add_flextable(doc,ft1)
-    doc <-body_add_break(doc)
+    tab[[j+1]]<-ft1
+    ft1<-NULL
   }
+
 
   ###ADD PROGRAMS LIST
   prog <- unlist(paste0(lst$renam[lst$type == "program"],
@@ -773,29 +759,30 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
     hyp2 <- hyp1[, "Location"]
     hyp1[, "Location"] <- ""
     hyp11 <- paste0(prog.location, hyp1[, "Program"])
-    tab3data$Location<-seq(nrow(tab3data))
-    tab3data$X<-hyp0
-    tab3data$link<-hyp11
+    tab3data$Location<-seq(nrow(tab3data))+nrow(inp)
+    tab3data$D<-hyp0
+    tab3data$E<-hyp11
 
-    ft1 <- flextable(data = tab3data)
-    ft1 <- compose(x = ft1, j=4,value = multi_hyperlink_text(X,link))
-    ft1 <- color(x = ft1,j =4,color = "#0000EE")
-    ft1 <- void(x = ft1,~X+link, part = "all")
+    ft2 <- flextable(data = tab3data)
+    ft2 <- compose(x = ft2, j=4,value = multi_hyperlink_text(D,E))
+    ft2 <- color(x = ft2,j =4,color = "#0000EE")
+    ft2 <- void(x = ft2,~D+E, part = "all")
 
     for(i in 1:nrow(tab3data)){
-      ft1<-merge_at(ft1,j=4:6,i=i)
+      ft2<-merge_at(ft2,j=4:6,i=i)
     }
-    ft1<-merge_at(ft1,j=4:6,part="header")
-    ft1<-bold(ft1,part="header")
-
+    ft2<-merge_at(ft2,j=4:6,part="header")
+    ft2<-bold(ft2,part="header")
     bord<-fp_border(color="black")
     #ft1<-border(ft1,border.right=bord)
-    ft1<-border_outer(ft1,border=bord)
-    ft1<-border_inner(ft1,border=bord)
-    ft1<-vline(ft1,j=4,border=bord)
-
-    ft1<-font(ft1, fontname = "Times New Roman", part = "all")
-    ft1<-set_table_properties(ft1, width = .7, layout = "autofit")
+    ft2<-border_outer(ft2,border=bord)
+    ft2<-border_inner(ft2,border=bord)
+    bord<-fp_border(color="black")
+    ft2<-vline(ft2,j=4,border=bord)
+    ft2<-font(ft2, fontname = "Times New Roman", part = "all")
+    ft2<-set_table_properties(ft2, width = .7, layout = "autofit")
+    tab[[length(tab)+1]]<-ft2
+    ft2<-NULL
   }
 
   #FOR PMDA
@@ -810,8 +797,6 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
                            Description = "", Input_Output_log_file_original_names = "")
     tab<-as.data.frame(matrix(ncol=3,nrow=length(origprog)))
     names(tab)<-c("Program#Original names","Description#Purpose","Input#Output#log file#original_names")
-
-
     #tab = FlexTable(data=tab3data, header.columns = T)
     for (i in 1:length(origprog)) {
       op <- paste0("./programs/", prog[i])
@@ -887,17 +872,59 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
     pm<-bold(pm,part="header")
     pm<-font(pm, fontname = "Times New Roman", part = "all")
     pm<-set_table_properties(pm, width = .8, layout = "autofit")
+    length(tab)
+    tab[[length(tab)+1]]<-pm
+    pm<-NULL
   }
 
-  doc <- body_add_par(doc,"PROGRAMS TABLE OF CONTENTS",style = c("heading 1"))
-  if (nrow(IOD) == 0) {
-    doc <- body_add_flextable(doc,ft1)
-    doc<-body_end_section_portrait(doc)}else{
-      doc <- body_add_flextable(doc,pm)
-      doc<-body_end_section_portrait(doc)}
+  img_in_par <- fpar(
+    external_img(src ="c:/lhtemplate/logo.png",width=3.5,height=1.44),
+    fp_p = fp_par(text.align = "center") )
+  text_style <- fp_text(font.size =15,bold=T)
+  par_style <- fp_par(text.align = "center")
 
-  fname<-paste0(define.location,"define.docx")
+
+  doc<-read_docx("c:/lhtemplate/style.docx")
+  doc <- body_add_fpar(doc,img_in_par)
+  #doc <- body_add_break(doc)
+  an_fpar <- fpar("", run_linebreak())
+  doc <- body_add(doc, an_fpar)
+  doc <- body_add_fpar(doc, fpar( ftext(title, prop = text_style), fp_p = par_style ) )
+  doc <-body_add_break(doc)
+  doc <- body_add_toc(doc,level=2)
+  doc <-body_add_break(doc)
+  doc <- body_add_par(doc,"DATASETS TABLE OF CONTENTS",style = c("heading 1"))
+  doc <- body_add_flextable(doc,tab[[1]])
+  doc <-body_add_break(doc)
+
+  fname<-paste0(define.location,"1_DATASETS TABLE OF CONTENTS.docx")
   print(doc,fname)
+
+  doc<-read_docx("c:/lhtemplate/style.docx")
+  doc <- body_add_par(doc,"VARIABLE DEFINITION TABLES",style = c("heading 1"))
+  for(i in 1:nrow(inp)){
+    t1<-as.character(tab1data$outp[j])
+    doc <- body_add_par(doc,t1,style = c("heading 2"))
+    doc <- body_add_flextable(doc,tab[[i+1]])
+    doc <-body_add_break(doc)
+  }
+  fname<-paste0(define.location,"2_VARIABLE DEFINITION TABLES.docx")
+  print(doc,fname)
+
+  if(nrow(IOD)==0){
+    doc<-read_docx("c:/lhtemplate/style.docx")
+    doc <- body_add_par(doc,"PROGRAMS TABLE OF CONTENTS",style = c("heading 1"))
+    doc <- body_add_flextable(doc,tab[[i+1+1]])
+    fname<-paste0(define.location,"3_PROGRAMS TABLE OF CONTENTS_FDA.docx")
+    print(doc,fname)}
+
+  if(nrow(IOD)>0){
+    doc<-read_docx("c:/lhtemplate/style.docx")
+    doc <- body_add_par(doc,"PROGRAMS TABLE OF CONTENTS",style = c("heading 1"))
+    doc <- body_add_flextable(doc,tab[[i+1+1]])
+    fname<-paste0(define.location,"4_PROGRAMS TABLE OF CONTENTS_PMDA.docx")
+    print(doc,fname)}
+
 }
 
 

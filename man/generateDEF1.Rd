@@ -6,9 +6,9 @@
 \usage{
 generateDEF1(
   title = "Add title here",
-  xpt.location = "./",
-  prog.location = "../programs/",
-  define.location = "./output/datasets/"
+  xpt.location = "./datasets/",
+  prog.location = "./programs/",
+  define.location = "./output/"
 )
 }
 \description{
