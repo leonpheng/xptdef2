@@ -748,9 +748,10 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./datasets/",
   ind <- lst[rownames(lst) %in% rownames(IOD), ]
   prono <- lst[rownames(lst) %in% rownames(IOD), "progNo"]
 
-
+  ind=nrow(inp)
   #FOR FDA
   if (nrow(IOD) == 0) {
+    ind=ind+2
     tab3data <- data.frame(Original = origprog, Program = prog,
                            Description = progdes, Location = location)
     orig <- origprog
@@ -781,8 +782,6 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./datasets/",
     ft2<-vline(ft2,j=4,border=bord)
     ft2<-font(ft2, fontname = "Times New Roman", part = "all")
     ft2<-set_table_properties(ft2, width = .7, layout = "autofit")
-    tab[[length(tab)+1]]<-ft2
-    ft2<-NULL
   }
 
   #FOR PMDA
@@ -873,9 +872,9 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./datasets/",
     pm<-font(pm, fontname = "Times New Roman", part = "all")
     pm<-set_table_properties(pm, width = .8, layout = "autofit")
     length(tab)
-    tab[[length(tab)+1]]<-pm
-    pm<-NULL
   }
+
+
 
   img_in_par <- fpar(
     external_img(src ="c:/lhtemplate/logo.png",width=3.5,height=1.44),
@@ -914,18 +913,20 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./datasets/",
   if(nrow(IOD)==0){
     doc<-read_docx("c:/lhtemplate/style.docx")
     doc <- body_add_par(doc,"PROGRAMS TABLE OF CONTENTS",style = c("heading 1"))
-    doc <- body_add_flextable(doc,tab[[i+1+1]])
+    doc <- body_add_flextable(docft2)
     fname<-paste0(define.location,"3_PROGRAMS TABLE OF CONTENTS_FDA.docx")
     print(doc,fname)}
 
   if(nrow(IOD)>0){
     doc<-read_docx("c:/lhtemplate/style.docx")
     doc <- body_add_par(doc,"PROGRAMS TABLE OF CONTENTS",style = c("heading 1"))
-    doc <- body_add_flextable(doc,tab[[i+1+1]])
+    doc <- body_add_flextable(doc,pm)
     fname<-paste0(define.location,"4_PROGRAMS TABLE OF CONTENTS_PMDA.docx")
     print(doc,fname)}
 
 }
+
+
 
 
 #' clearALL
