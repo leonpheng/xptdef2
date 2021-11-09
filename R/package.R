@@ -29,7 +29,7 @@ ipak <- function(pkg){
 #' install.packages()
 
 install.packages<-function(...){
-  packages <- c("SASxport", "reshape", "Hmisc", "tidyr","plyr","downloader","officer","flextable")
+  packages <- c("SASxport", "reshape", "Hmisc", "tidyr","plyr","downloader")
   ipak(packages)
 
   require(downloader)
@@ -70,8 +70,7 @@ install.packages<-function(...){
 #' load.pack1()
 
 load.pack1<-function(...){
-  library(officer)
-  library(flextable)
+  library("ReporteRs")
   library(plyr)
   require(reshape)     # To format summary
   #require(PCSmisc)     #
@@ -514,30 +513,9 @@ if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Error due to missing 
 #' @export
 #' @examples
 #' generateDEF1()
-generateDEF1<-function (title = "Add title here", xpt.location = "./datasets/",
-                        prog.location = "./programs/", define.location = "./output/")
+generateDEF1<-function (title = "Add title here", xpt.location = "./",
+                        prog.location = "../programs/", define.location = "./output/datasets/")
 {
-
-  library(officer)
-  library(flextable)
-
-  ##FUNCTION
-  multi_hyperlink_text<-function(labels, links){
-    out <- mapply(
-      function(text, url){
-        dat <- hyperlink_text(text, url = url)
-        dat <- split(dat, seq_along(text))
-        as_paragraph(list_values = dat)
-      },
-      text = strsplit(labels, split = ","),
-      url = strsplit(links, split = ","), SIMPLIFY = FALSE, USE.NAMES = FALSE
-    )
-
-    # the following is necessary to comply with expected
-    # flextable structure !
-    Reduce(append, out)
-  }
-  ###############
   setwd(working.folder)
   pathwork <- getwd()
   pathdir <- pathwork
@@ -562,9 +540,10 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./datasets/",
                                                           "", outdir), prog = "NA")
   inp1 <- data.frame(Dataset = paste0(sub(".csv", "",
                                           outdir), ".xpt"), `Original Name` = oriname,
-                     Description = description, Keyvariables = key, Datasetfullname = paste0("#datasets#", paste0(sub(".csv", "", outdir), ".xpt")))
+                     Description = description, Keyvariables = key, Datasetfullname = paste0("#datasets#",
+                                                                                             paste0(sub(".csv", "", outdir), ".xpt")))
   inp1$Original.Name <- gsub(inp1$Original.Name, pattern = "\\_",
-                             replacement = "_")
+                             replacement = "XXXX")
   chclass <- function(data, var, class = "char") {
     for (i in var) {
       if (class == "num") {
@@ -581,55 +560,46 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./datasets/",
   maintit <- data.frame(tit = c("TABLE OF CONTENTS",
                                 "DATASETS TABLE OF CONTENTS", "VARIABLE DEFINITION TABLES",
                                 "PROGRAMS TABLE OF CONTENTS"))
+  style1 <- textProperties(color = "black", font.size = 12,
+                           font.weight = "bold", font.style = "normal",
+                           underlined = FALSE, font.family = getOption("ReporteRs-default-font"))
+  if ("style.docx" %in% dir("c:/lhtemplate")) {
+    doc <- docx(template = "c:/lhtemplate/style.docx",
+                empty_template = TRUE)
+    doc = map_title(doc, stylenames = c("Heading1",
+                                        "Heading2", "Heading3"))
+  } else {
+    doc <- docx()
+  }
 
   tabn <- c("Dataset", "Original Name", "Description",
             "Key Variables", "Location")
   hyp0 <- inp1[, "Datasetfullname"]
   inp1[, "Datasetfullname"] <- ""
-
+  tab = FlexTable(data = inp1[1:nrow(inp1), ], header.columns = FALSE)
+  tab = addHeaderRow(tab, text.properties = textBold(), value = tabn)
   hyp1 <- paste0(sub(".csv", "", outdir), ".xpt")
-  loc1 <- paste0(xpt.location, hyp1)
-
-  names(inp1)<-tabn
-
-  inp1$Location<-seq(length(loc1))
-
-  inp1$A<-hyp0
-  inp1$link<-loc1
-
-  ft <- flextable(data = inp1)
-  ft <- compose(x = ft, j=5, value = multi_hyperlink_text(A,link))
-  ft <- color(x = ft, j =5,color = "#0000EE")
-
-  ft <- void(ft, ~A+link)
-  ft <- void(ft, ~A+link,part="header")
-  ft<-bold(ft,part="header")
-  ft<-merge_at(ft,j=5:7,part="header")
-
-  for(i in 1:2){
-    ft<-merge_at(ft,j=5:7,i=i)
+  for (i in 1:length(hyp1)) {
+    loc1 <- paste0(xpt.location, hyp1[i])
+    hyp11 <- loc1
+    tab[i, 5] = pot(hyp0[i], hyperlink = hyp11, textBold(color = "#0000EE",
+                                                         underline = F))
   }
-
-  ft<-border_outer(ft)
-  ft<-border_inner(ft)
-  ft<-font(ft, fontname = "Times New Roman", part = "all")
-  ft<-set_table_properties(ft, width = .7, layout = "autofit")
-
-  tab<-NULL
-  tab[[1]]<-ft
-  ft<-NULL
-
-  #doc<-read_docx()
-
-
-  #START LOOP FOR VARIABLE DEFINE LIST
-
+  if ("logo.png" %in% dir("c:/lhtemplate")) {
+    doc <- doc %>% addImage("c:/lhtemplate/logo.png",
+                            par.properties = parProperties(text.align = "center"),
+                            width = 3.35, height = 1.6)
+  }
+  doc <- doc %>% addParagraph(pot(title, style1), par.properties = parProperties(text.align = "center")) %>%
+    addPageBreak() %>% addParagraph(pot("TABLE OF CONTENTS",
+                                        style1), par.properties = parProperties(text.align = "left")) %>%
+    addTOC(level_max = 3) %>% addPageBreak() %>% addTitle("DATASETS TABLE OF CONTENTS",
+                                                          level = 1) %>% addFlexTable(tab) %>% addPageBreak() %>%
+    addTitle("VARIABLE DEFINITION TABLES", level = 1)
   tab1data <- inp
-
   for (j in 1:nrow(inp)) {
-    t1<-as.character(tab1data$outp[j])
-    doc <- body_add_par(doc,t1,style = c("heading 2"))
-    #ADD DEFINE LIST
+    doc <- addTitle(doc, as.character(tab1data$outp[j]),
+                    level = 2)
     data <- read.csv(file.path(outputdir, paste(inp$outp[j],
                                                 "define.csv", sep = "")))
     data$SAS.Variable <- toupper(data$SAS.Variable)
@@ -647,144 +617,48 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./datasets/",
                                  nrow = 1, data = tw1bn))
     names(tw1b) <- names(data)
     tw2 <- rbind(tw1a, tw1b, data)
-    head(tw2)
-
-    #------->header
-    dts1 <- gsub(".xpt","",as.character(inp1$Dataset[j]))
-    orin= as.character(inp1$"Original Name"[j])
-    struc= as.character(struct[j])
-    dts2 <- as.character(inp1$Dataset[j])
-    link1 <- as.character(inp1$link[j])#color = "#0000EE"
-
-    no_prog<-usedprog[j] == "NA" | usedprog[j] == ""
-    if (no_prog) {
-      prog = as.character(usedprog[j])
-      link2 <-as.character(usedprog[j])
+    tab = FlexTable(data = tw2, header.columns = FALSE)
+    tab[6, 1:6] = textProperties(font.weight = "bold")
+    tab[1, 1] = textProperties(font.weight = "bold")
+    tab[4:5, 2] = textProperties(color = "blue")
+    tab = spanFlexTableColumns(tab, i = 1:5, from = 1, to = 6)
+    tab = spanFlexTableColumns(tab, i = 2, from = 1, to = 6)
+    tab = spanFlexTableColumns(tab, i = 3, from = 1, to = 6)
+    tab[2, 1, text.properties = textNormal(color = "black")] = as.character(inp1$Original.Name[j])
+    tab[3, 1, text.properties = textNormal(color = "black")] = as.character(struct[j])
+    hyp2 <- as.character(inp1$Dataset[j])
+    hyp11 <- paste0(xpt.location, as.character(inp1$Dataset[j]))
+    tab[4, 1] = pot(hyp2, hyperlink = hyp11, textBold(color = "#0000EE",
+                                                      underline = F))
+    if (usedprog[j] == "NA" | usedprog[j] == "") {
+      tab[5, 1] = as.character(usedprog[j])
     }    else {
-      prog <- as.character(paste0(usedprog[j], ".txt"))
-      link2 <- paste0(prog.location,as.character(paste0(usedprog[j], ".txt")))
+      hyp2 <- as.character(paste0(usedprog[j], ".txt"))
+      hyp11 <- paste0(prog.location, hyp2)
+      tab[5, 1] = pot(hyp2, hyperlink = hyp11, textBold(color = "#0000EE",
+                                                        underline = F))
     }
-
-    names(tw2)
-    #------->header
-    tw2$B<-""
-    tw2$C<-""
-    tw2$B[4:5]<-c(dts2,"")
-    tw2$C[4:5]<-c(link1,"")
-    tw2$SAS.Label[c(1:3)]<-c("",orin,struc)
-    tw2$SAS.Label[c(4:5)]<-c(1,"")
-
-    if (!no_prog) {
-      tw2$SAS.Label[5]<-2
-      tw2$B[5]<-c(prog)
-      tw2$C[5]<-c(link2)
-    }
-
-    tw2$B<-as.character(tw2$B)
-    tw2$C<-as.character(tw2$C)
-
-    ft1 <- flextable(data = tw2)
-
-    if(no_prog){
-      ft1 <- compose(x = ft1, j=2,i=4, value = multi_hyperlink_text(B,C))
-      ft1 <- color(x = ft1,i=4, j =2,color = "#0000EE")
-    }else{
-      ft1 <- compose(x = ft1, j=2,i=4:5, value = multi_hyperlink_text(B,C))
-      ft1 <- color(x = ft1,i=4:5, j =2,color = "#0000EE")
-    }
-
-    ft1<-bold(ft1,i=1,j=1:2)
-    ft1<-bold(ft1,i=6)
-    ft1<-bold(ft1,i=4,j=2)
-    ft1<-bold(ft1,i=5,j=2)
-    ft1 <- delete_part(x = ft1, part = "header")
-    ft1 <- void(x = ft1,~B+C, part = "body")
-    for(i in 2:5){
-      ft1<-merge_at(ft1,j=2:7,i=i)
-    }
-
-    ft1<-merge_at(ft1,j=1:8,i=1)
-    ft1<-merge_at(ft1,j=2:8,i=2)
-    ft1<-merge_at(ft1,j=2:8,i=3)
-    ft1<-merge_at(ft1,j=2:8,i=4)
-    ft1<-merge_at(ft1,j=2:8,i=5)
-
-    lr<-nrow(data)+6
-    for(i in 6:lr){
-      ft1<-merge_at(ft1,j=6:8,i=i)
-    }
-
-    bord<-fp_border(color="black")
-    #ft1<-border(ft1,border.right=bord)
-    ft1<-border_outer(ft1,border=bord)
-    #ft1<-border_outer(ft1,i=2:5,j=1:2,border=bord)
-    ft1<-hline(ft1,i=5,border=bord)
-    ft1<-vline(ft1,i=2:5,j=2,border=bord)
-    ft1<-vline(ft1,i=1,j=1,border=bord)
-    ft1<-vline(ft1,j=1:6, i=6:lr,border=bord)
-    ft1<-hline(ft1, i=6:lr,border=bord)
-
-    ft1<-font(ft1, fontname = "Times New Roman", part = "all")
-    ft1<-set_table_properties(ft1, width = .7, layout = "autofit")
-    tab[[j+1]]<-ft1
-    ft1<-NULL
+    border_ <- borderProperties(style = "none")
+    tab[1:4, 1:6, side = "bottom"] <- border_
+    doc <- addFlexTable(doc, tab)
+    doc <- doc %>% addPageBreak()
   }
-
-
-  ###ADD PROGRAMS LIST
   prog <- unlist(paste0(lst$renam[lst$type == "program"],
                         ".txt"))
   progdes <- unlist(paste0(lst$description[lst$type == "program"]))
   origprog <- unlist(paste0(lst$filename[lst$type != "dataset"]))
   location <- paste0("#programs#", prog)
-
-
+  doc <- addTitle(doc, "PROGRAMS TABLE OF CONTENTS",
+                  level = 1)
   dir(progdir)
   include <- paste0(lst$rename[lst$progNo != "" & !is.na(lst$progNo)],
                     ".txt")
   IOD <- lst[lst$progNo %in% lst$progNo[lst$progNo != "" &
                                           !is.na(lst$progNo)] & !is.na(lst$progNo), ]
-
   ind <- lst[rownames(lst) %in% rownames(IOD), ]
   prono <- lst[rownames(lst) %in% rownames(IOD), "progNo"]
 
-  ind=nrow(inp)
-  #FOR FDA
-  if (nrow(IOD) == 0) {
-    ind=ind+2
-    tab3data <- data.frame(Original = origprog, Program = prog,
-                           Description = progdes, Location = location)
-    orig <- origprog
-    hyp0 <- paste0("#programs#", tab3data[, "Program"])
-    hyp1 <- tab3data
-    hyp2 <- hyp1[, "Location"]
-    hyp1[, "Location"] <- ""
-    hyp11 <- paste0(prog.location, hyp1[, "Program"])
-    tab3data$Location<-seq(nrow(tab3data))+nrow(inp)
-    tab3data$D<-hyp0
-    tab3data$E<-hyp11
 
-    ft2 <- flextable(data = tab3data)
-    ft2 <- compose(x = ft2, j=4,value = multi_hyperlink_text(D,E))
-    ft2 <- color(x = ft2,j =4,color = "#0000EE")
-    ft2 <- void(x = ft2,~D+E, part = "all")
-
-    for(i in 1:nrow(tab3data)){
-      ft2<-merge_at(ft2,j=4:6,i=i)
-    }
-    ft2<-merge_at(ft2,j=4:6,part="header")
-    ft2<-bold(ft2,part="header")
-    bord<-fp_border(color="black")
-    #ft1<-border(ft1,border.right=bord)
-    ft2<-border_outer(ft2,border=bord)
-    ft2<-border_inner(ft2,border=bord)
-    bord<-fp_border(color="black")
-    ft2<-vline(ft2,j=4,border=bord)
-    ft2<-font(ft2, fontname = "Times New Roman", part = "all")
-    ft2<-set_table_properties(ft2, width = .7, layout = "autofit")
-  }
-
-  #FOR PMDA
   if (nrow(IOD) > 0) {
     prog <- unlist(paste0(ind$renam[ind$type != "dataset"],
                           ".txt"))
@@ -795,39 +669,45 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./datasets/",
     tab3data <- data.frame(Program_Original_names = "",
                            Description = "", Input_Output_log_file_original_names = "")
     tab<-as.data.frame(matrix(ncol=3,nrow=length(origprog)))
-    names(tab)<-c("Program#Original names","Description#Purpose","Input#Output#log file#original_names")
+    names(tab)<-c("Program_Original-names","Description","Input_Output_log_file_original_names")
     #tab = FlexTable(data=tab3data, header.columns = T)
+    tab = FlexTable(tab)
+
     for (i in 1:length(origprog)) {
+
       op <- paste0("./programs/", prog[i])
       space = "\n  "
-      tab[i, 1] =paste(prog[i], "\n(original:",
-                       origprog[i],")")
-      tab[i,2] = paste("Software used:\n ",software.used[i],"\n\nPurpose:\n ", progdes[i])
-      io1 <- lst[grep(prono[i],lst$proNo.input), ]
-      io2 <- lst[grep(prono[i],lst$proNo.output), ]
-      io3 <- lst[grep(prono[i],lst$progNo.dependent),]
-
+      tab[i, 1] = pot(prog[i]) + "\n(original:" +
+        pot(origprog[i]) + ")"
+      tab[i, 2] = pot("Software used: ", textBold()) +
+        software.used[i] + space + pot("Purpose: ",
+                                       textBold()) + progdes[i]
+      io1 <- lst[grep(prono[i], lst$proNo.input), ]
+      io2 <- lst[grep(prono[i], lst$proNo.output), ]
+      io3 <- lst[grep(prono[i], lst$progNo.dependent),
+      ]
       if (nrow(io1) == 0) {
         zz0 <- ""
+        tt = pot("", textBold())
       } else {
         zz0 <- ""
         for (io in 1:nrow(io1)) {
           ext1 <- ifelse(io1$type[io] == "program",
                          ".txt", ".xpt")
           txtins <- paste0(io1$rename[io], ext1)
-
           ext2 <- ifelse(io1$type[io] == "program",
                          "./programs/", "./datasets/")
           insert <- paste0(ext2, txtins)
-          orf <- paste0("(original:",io1$filename[io],
+          orf <- paste0("(original:", io1$filename[io],
                         ")")
           col = "#0000EE"
           space = "\n  "
-          zz0<-paste0(zz0,txtins,space,orf)
+          zz0 <- zz0 + pot(txtins, textNormal()) + space +
+            pot(orf, textNormal()) + space
         }
       }
       if (nrow(io2) == 0) {
-        zz1 =""
+        zz1 = pot("", textBold())
       }      else {
         zz1 <- ""
         for (io in 1:nrow(io2)) {
@@ -841,13 +721,13 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./datasets/",
                         ")")
           col = "#0000EE"
           space = "\n  "
-          zz1<-paste0(zz1,txtins,space,orf)
+          zz1 <- zz1 + pot(txtins, textNormal()) + space +
+            pot(orf, textNormal()) + space
         }
       }
-
       if (nrow(io3) == 0) {
-        zz2 =""
-      } else {
+        zz2 = pot("", textBold())
+      }      else {
         zz2 <- ""
         for (io in 1:nrow(io3)) {
           ext1 <- ifelse(io3$type[io] == "program",
@@ -860,74 +740,45 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./datasets/",
                         ")")
           col = "#0000EE"
           space = "\n  "
-          zz2<-paste0(zz2,txtins,space,orf)
+          zz2 <- zz2 + pot(txtins, textNormal()) + space +
+            pot(orf, textNormal()) + space
         }
       }
+      head(tab)
+
+      tab[i, 3] = pot("[Input]", textBold()) + "\n " +
+        zz0 + "\n  " + pot("[Output]", textBold()) +
+        "\n  " + zz1 + "\n  " + pot("[Dependency]",
+                                    textBold()) + "\n  " + zz2
     }
-    tab[i, 3] = paste0("[Input]","\n ",zz0,"\n\n","[Output]","\n  ", zz1,"\n\n [Dependency]\n",zz2)
-    pm <- flextable(data =tab)
-    pm<-border_outer(pm,border=bord)
-    pm<-border_inner(pm,border=bord)
-    pm<-bold(pm,part="header")
-    pm<-font(pm, fontname = "Times New Roman", part = "all")
-    pm<-set_table_properties(pm, width = .8, layout = "autofit")
-    length(tab)
+  } else {
+    if (length(dir(progdir)) >= 1 & nrow(IOD) == 0) {
+      tab3data <- data.frame(Original = origprog, Program = prog,
+                             Description = progdes, Location = location)
+    } else {
+      tab3data <- data.frame(Original = "", Program = "",
+                             Description = "", Location = "")
+    }
   }
 
-
-
-  img_in_par <- fpar(
-    external_img(src ="c:/lhtemplate/logo.png",width=3.5,height=1.44),
-    fp_p = fp_par(text.align = "center") )
-  text_style <- fp_text(font.size =15,bold=T)
-  par_style <- fp_par(text.align = "center")
-
-
-  doc<-read_docx("c:/lhtemplate/style.docx")
-  doc <- body_add_fpar(doc,img_in_par)
-  #doc <- body_add_break(doc)
-  an_fpar <- fpar("", run_linebreak())
-  doc <- body_add(doc, an_fpar)
-  doc <- body_add_fpar(doc, fpar( ftext(title, prop = text_style), fp_p = par_style ) )
-  doc <-body_add_break(doc)
-  doc <- body_add_toc(doc,level=2)
-  doc <-body_add_break(doc)
-  doc <- body_add_par(doc,"DATASETS TABLE OF CONTENTS",style = c("heading 1"))
-  doc <- body_add_flextable(doc,tab[[1]])
-  doc <-body_add_break(doc)
-
-  fname<-paste0(define.location,"1_DATASETS TABLE OF CONTENTS.docx")
-  print(doc,fname)
-
-  doc<-read_docx("c:/lhtemplate/style.docx")
-  doc <- body_add_par(doc,"VARIABLE DEFINITION TABLES",style = c("heading 1"))
-  for(i in 1:nrow(inp)){
-    t1<-as.character(tab1data$outp[j])
-    doc <- body_add_par(doc,t1,style = c("heading 2"))
-    doc <- body_add_flextable(doc,tab[[i+1]])
-    doc <-body_add_break(doc)
+  if (nrow(IOD) == 0) {
+    orig <- origprog
+    hyp0 <- paste0("#programs#", tab3data[, "Program"])
+    hyp1 <- tab3data
+    hyp2 <- hyp1[, "Location"]
+    hyp1[, "Location"] <- ""
+    tab = FlexTable(data = hyp1[1:nrow(hyp1), ], header.columns = FALSE)
+    tab = addHeaderRow(tab, text.properties = textBold(),
+                       value = as.character(names(tab3data)))
+    for (i in 1:length(hyp0)) {
+      hyp11 <- paste0(prog.location, hyp1[, "Program"][i])
+      tab[i, 4] = pot(hyp0[i], hyperlink = hyp11, textBold(color = "#0000EE",
+                                                           underline = F))
+    }
   }
-  fname<-paste0(define.location,"2_VARIABLE DEFINITION TABLES.docx")
-  print(doc,fname)
-
-  if(nrow(IOD)==0){
-    doc<-read_docx("c:/lhtemplate/style.docx")
-    doc <- body_add_par(doc,"PROGRAMS TABLE OF CONTENTS",style = c("heading 1"))
-    doc <- body_add_flextable(docft2)
-    fname<-paste0(define.location,"3_PROGRAMS TABLE OF CONTENTS_FDA.docx")
-    print(doc,fname)}
-
-  if(nrow(IOD)>0){
-    doc<-read_docx("c:/lhtemplate/style.docx")
-    doc <- body_add_par(doc,"PROGRAMS TABLE OF CONTENTS",style = c("heading 1"))
-    doc <- body_add_flextable(doc,pm)
-    fname<-paste0(define.location,"4_PROGRAMS TABLE OF CONTENTS_PMDA.docx")
-    print(doc,fname)}
-
+  doc <- addFlexTable(doc, tab)
+  writeDoc(doc, paste0(define.location, "define.docx"))
 }
-
-
-
 
 #' clearALL
 #'
