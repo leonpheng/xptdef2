@@ -579,12 +579,14 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
   tab = FlexTable(data = inp1[1:nrow(inp1), ], header.columns = FALSE)
   tab = addHeaderRow(tab, text.properties = textBold(), value = tabn)
   hyp1 <- paste0(sub(".csv", "", outdir), ".xpt")
+
   for (i in 1:length(hyp1)) {
     loc1 <- paste0(xpt.location, hyp1[i])
     hyp11 <- loc1
     tab[i, 5] = pot(hyp0[i], hyperlink = hyp11, textBold(color = "#0000EE",
                                                          underline = F))
   }
+
   if ("logo.png" %in% dir("c:/lhtemplate")) {
     doc <- doc %>% addImage("c:/lhtemplate/logo.png",
                             par.properties = parProperties(text.align = "center"),
@@ -597,6 +599,9 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
                                                           level = 1) %>% addFlexTable(tab) %>% addPageBreak() %>%
     addTitle("VARIABLE DEFINITION TABLES", level = 1)
   tab1data <- inp
+
+  writeDoc(doc,"./output/test.docx")
+
   for (j in 1:nrow(inp)) {
     doc <- addTitle(doc, as.character(tab1data$outp[j]),
                     level = 2)
@@ -677,7 +682,9 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
 
       op <- paste0("./programs/", prog[i])
       space = "\n  "
-      tab[i, 1] = pot(prog[i]) + "\n(original:" +
+
+      tab[i, 1] = pot(prog[i], hyperlink = op, textBold(color = "#0000EE",
+                                                           underline = F)) + "\n(original:" +
         pot(origprog[i]) + ")"
       tab[i, 2] = pot("Software used: ", textBold()) +
         software.used[i] + space + pot("Purpose: ",
@@ -702,8 +709,9 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
                         ")")
           col = "#0000EE"
           space = "\n  "
-          zz0 <- zz0 + pot(txtins, textNormal()) + space +
-            pot(orf, textNormal()) + space
+
+          zz0 <- zz0 + pot(txtins, hyperlink = ext2, textBold(color = "#0000EE",
+                                                                 underline = F)) +            space +pot(orf, textNormal()) + space
         }
       }
       if (nrow(io2) == 0) {
@@ -721,7 +729,8 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
                         ")")
           col = "#0000EE"
           space = "\n  "
-          zz1 <- zz1 + pot(txtins, textNormal()) + space +
+          zz1 <- zz1 + pot(txtins, hyperlink = ext2, textBold(color = "#0000EE",
+            underline = F)) + space +
             pot(orf, textNormal()) + space
         }
       }
