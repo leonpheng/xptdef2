@@ -710,7 +710,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
           col = "#0000EE"
           space = "\n  "
 
-          zz0 <- zz0 + pot(txtins, hyperlink = ext2, textBold(color = "#0000EE",
+          zz0 <- zz0 + pot(txtins, hyperlink = insert, textBold(color = "#0000EE",
                                                                  underline = F)) +            space +pot(orf, textNormal()) + space
         }
       }
@@ -729,7 +729,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
                         ")")
           col = "#0000EE"
           space = "\n  "
-          zz1 <- zz1 + pot(txtins, hyperlink = ext2, textBold(color = "#0000EE",
+          zz1 <- zz1 + pot(txtins, hyperlink = insert, textBold(color = "#0000EE",
             underline = F)) + space +
             pot(orf, textNormal()) + space
         }
