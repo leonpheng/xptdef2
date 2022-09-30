@@ -703,7 +703,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
                          ".txt", ".xpt")
           txtins <- paste0(io1$rename[io], ext1)
           ext2 <- ifelse(io1$type[io] == "program",
-                         "./programs/", "./datasets/")
+                         "./programs/", "./")
           insert <- paste0(ext2, txtins)
           orf <- paste0("(original:", io1$filename[io],
                         ")")
@@ -723,7 +723,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
                          ".txt", ".xpt")
           txtins <- paste0(io2$rename[io], ext1)
           ext2 <- ifelse(io2$type[io] == "program",
-                         "./programs/", "./datasets/")
+                         "./programs/", "./")
           insert <- paste0(ext2, txtins)
           orf <- paste0("(original:", io2$filename[io],
                         ")")
@@ -743,7 +743,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
                          ".txt", ".xpt")
           txtins <- paste0(io3$rename[io], ext1)
           ext2 <- ifelse(io3$type[io] == "program",
-                         "./programs/", "./datasets/")
+                         "./programs/", "./")
           insert <- paste0(ext2, txtins)
           orf <- paste0("(original:", io3$filename[io],
                         ")")
