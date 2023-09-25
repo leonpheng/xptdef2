@@ -341,10 +341,31 @@ generateXPT<-function(range.character=NULL){
     names(x) <- gsub( x=names(x), pattern="[.]", replacement="_" )
     return(x)
   }
+  autoclass<-function (dat)
+  {
+    dat <- chclass(dat, names(dat), "char")
+    var <- names(dat)
+    for (i in var) {
+      numt <- as.numeric(dat[, i])
+      if (all.is.numeric(dat[, i], what = c("test", "vector", "nonnum"),
+                         extras = c(".", "NA", "NaN", " ", "  ", NA))) {
+        dat[, i] <- unlist(as.numeric(as.character(dat[,
+                                                       i])))
+      } else {
+        dat[, i] <- paste0("", unlist(dat[, i]))
+      }
+    }
+    dat
+  }
+
+
+
   setwd(working.folder)
   pathwork<-getwd()
   pathdir<-pathwork
   load.pack1()
+
+
 
   input<-paste0(pathwork,"/input")
   progdir <- "./output/programs"# This folder should contain all program and output .txt
@@ -600,7 +621,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
     addTitle("VARIABLE DEFINITION TABLES", level = 1)
   tab1data <- inp
 
-  writeDoc(doc,"./output/test.docx")
+  #writeDoc(doc,"./output/test.docx")
 
   for (j in 1:nrow(inp)) {
     doc <- addTitle(doc, as.character(tab1data$outp[j]),

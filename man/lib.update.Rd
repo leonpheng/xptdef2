@@ -5,8 +5,8 @@
 \title{Update library}
 \usage{
 lib.update(
- 
-    prevlib = "//certara.com/sites/S02-Cary/Consulting/Projects/ras/Nath team/library/xptlibrary.csv",
+  prevlib =
+    "//certara.com/sites/S02-Cary/Consulting/Projects/ras/Nath team/library/xptlibrary.csv",
   newlib = "studydefinelist.csv"
 )
 }
