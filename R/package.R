@@ -669,7 +669,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
     doc <- addFlexTable(doc, tab)
     doc <- doc %>% addPageBreak()
   }
-  prog <- unlist(paste0(lst$renam[lst$type == "program"],
+prog <- unlist(paste0(lst$renam[lst$type == "program"],
                         ".txt"))
   progdes <- unlist(paste0(lst$description[lst$type == "program"]))
   origprog <- unlist(paste0(lst$filename[lst$type != "dataset"]))
@@ -685,7 +685,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
   prono <- lst[rownames(lst) %in% rownames(IOD), "progNo"]
 
 
-  if (nrow(IOD) > 0) {
+  if (nrow(IOD[IOD$type=="program",]) > 0) {
     prog <- unlist(paste0(ind$renam[ind$type != "dataset"],
                           ".txt"))
     progdes <- unlist(paste0(ind$Purpose[ind$type != "dataset"]))
@@ -699,10 +699,9 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
     #tab = FlexTable(data=tab3data, header.columns = T)
     tab = FlexTable(tab)
 
-    for (i in 1:length(origprog)) {
-
+for (i in 1:length(origprog)) {
       op <- paste0(prog.location, prog[i])
-      space = "\n  "
+      space = "\n "
 
       tab[i, 1] = pot(prog[i], hyperlink = op, textBold(color = "#0000EE",
                                                            underline = F)) + "\n(original:" +
@@ -710,15 +709,17 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
       tab[i, 2] = pot("Software used: ", textBold()) +
         software.used[i] + space + pot("Purpose: ",
                                        textBold()) + progdes[i]
-      io1 <- lst[grep(prono[i], lst$proNo.input), ]
-      io2 <- lst[grep(prono[i], lst$proNo.output), ]
-      io3 <- lst[grep(prono[i], lst$progNo.dependent),
-      ]
+
+      lst1<-lst$filename[lst$filename%in%origprog[i]]
+      io1 <- lst[stringr::str_detect(lst$proNo.input[lst$filename==lst1],prono), ]
+      io2 <- lst[stringr::str_detect(lst$proNo.output[lst$filename==lst1],prono), ]#lst[grep(prono[i], lst$proNo.output[i]), ]
+      io3 <- lst[stringr::str_detect(lst$progNo.dependent[lst$filename==lst1],prono), ]#lst[grep(prono[i], lst$progNo.dependent),]
+
       if (nrow(io1) == 0) {
-        zz0 <- ""
-        tt = pot("", textBold())
+        #zz0 <- ""
+        zz0 = pot("", textBold())+ "\n "
       } else {
-        zz0 <- ""
+        zz0 <- "\n "
         for (io in 1:nrow(io1)) {
           ext1 <- ifelse(io1$type[io] == "program",
                          ".txt", ".xpt")
@@ -729,10 +730,11 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
           orf <- paste0("(original:", io1$filename[io],
                         ")")
           col = "#0000EE"
-          space = "\n  "
+          space = "\n "
 
           zz0 <- zz0 + pot(txtins, hyperlink = insert, textBold(color = "#0000EE",
-                                                                 underline = F)) +            space +pot(orf, textNormal()) + space
+                                                                 underline = F)) +space +
+            pot(orf, textNormal()) + space
         }
       }
       if (nrow(io2) == 0) {
@@ -749,7 +751,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
           orf <- paste0("(original:", io2$filename[io],
                         ")")
           col = "#0000EE"
-          space = "\n  "
+          space = "\n "
           zz1 <- zz1 + pot(txtins, hyperlink = insert, textBold(color = "#0000EE",
             underline = F)) + space +
             pot(orf, textNormal()) + space
@@ -758,7 +760,7 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
       if (nrow(io3) == 0) {
         zz2 = pot("", textBold())
       }      else {
-        zz2 <- ""
+        zz2 <- "\n "
         for (io in 1:nrow(io3)) {
           ext1 <- ifelse(io3$type[io] == "program",
                          ".txt", ".xpt")
@@ -769,17 +771,17 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
           orf <- paste0("(original:", io3$filename[io],
                         ")")
           col = "#0000EE"
-          space = "\n  "
+          space = "\n "
           zz2 <- zz2 + pot(txtins, textNormal()) + space +
             pot(orf, textNormal()) + space
         }
       }
       head(tab)
 
-      tab[i, 3] = pot("[Input]", textBold()) + "\n " +
-        zz0 + "\n  " + pot("[Output]", textBold()) +
-        "\n  " + zz1 + "\n  " + pot("[Dependency]",
-                                    textBold()) + "\n  " + zz2
+      tab[i, 3] = pot("[Input]", textBold()) + "\n" +
+        zz0 + "\n " + pot("[Output]", textBold()) +
+        "\n " + zz1 + "\n " + pot("[Dependency]",
+                                    textBold()) + "\n" + zz2
     }
   } else {
     if (length(dir(progdir)) >= 1 & nrow(IOD) == 0) {
