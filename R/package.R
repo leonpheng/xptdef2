@@ -29,7 +29,7 @@ ipak <- function(pkg){
 #' install.packages()
 
 install.packages<-function(...){
-  packages <- c("SASxport", "reshape", "Hmisc", "tidyr","plyr","downloader")
+  packages <- c("SASxport", "reshape", "Hmisc", "tidyr","plyr","downloader","officer","flextable")
   ipak(packages)
 
   require(downloader)
@@ -70,7 +70,8 @@ install.packages<-function(...){
 #' load.pack1()
 
 load.pack1<-function(...){
-  library("ReporteRs")
+  library(officer)
+  library(flextable)
   library(plyr)
   require(reshape)     # To format summary
   #require(PCSmisc)     #
@@ -129,7 +130,7 @@ autoclass<-function(dat){
   for(i in var){
     # i="othername"
     numt<-as.numeric(dat[,i])
-    if(all.is.numeric(dat[,i],what = c("test","vector"),extras=c('.','NA',"NaN"," ","  ",NA)))
+    if(all.is.numeric(dat[,i]))#,what = c("test","vector"),extras=c('.','NA',"NaN"," ","  ",NA)))
       #nrow(dat[!is.na(as.numeric(as.character(dat[,i]))),])==0)
     {dat[,i]<-unlist(as.numeric(as.character(dat[,i])))
     }else{
@@ -164,47 +165,127 @@ mod<-function(filename,var){
 #' @export
 #' @examples
 #' importfiles()
+ 
+
 importfiles<-function(...){
   #lst<- read.xls(paste(pathwork,"list of files.xlsx",sep="/"), sheet = 1)
+  library(haven)
+  library(tidyverse)
+  library(officer)
+  library(flextable)
+  library(PCSmisc)
+  
   setwd(working.folder)
   mainDir<-getwd()
   subDir<-c("input","output","Backup")
-
+  
   for(i in 1:length(subDir)){
     dir.create(file.path(mainDir, subDir[i]), showWarnings = FALSE)
   }
+  
   mainDir<-paste0(getwd(),"/output")
+  
   subDir<-c("datasets","programs")
   for(i in 1:length(subDir)){
-    dir.create(file.path(mainDir, subDir[i]), showWarnings = FALSE)
+    dir.create(file.path(mainDir,subDir[i]), showWarnings = FALSE)
   }
-  dir()
+  
+  lst<- read.csv("list of files.csv")
+  lst$rename<-gsub("\\_","",lst$rename)
+  lst$rename<-gsub(" ","",lst$rename)
+  write.csv(lst,"list of files.csv",row.names = F)
+  
+  subDir2<-unique(lst$subfolder[lst$type=="txt"])
+  mainDir2<-paste0(getwd(),"/output/programs")
+  
+  if(agency=="PMDA"){
+  for(i in 1:length(subDir2)){
+    dir.create(file.path(mainDir2,subDir2[i]), showWarnings = FALSE)
+  }}
+  
   lst<- read.csv("list of files.csv")
   lst$type1<-"nonmem"
   lst$type1[grep(".csv",lst$filename)]<-"csv"
   lst$type1[lst$type!="dataset"]<-"txt"
+  
   lst$extension=".csv"
-  lst$extension[lst$type!="dataset"]<-".txt"
-  conv<-with(lst,paste0(rename,extension))
+  lst$extension[lst$type=="txt"]<-".txt"
+  conv<-with(lst,paste0(rename,".",type))
+  
   #lst<-lst[lst$xptconvert==1,]
-  for(i in 1:nrow(lst)){
-    odir1<-paste0(getwd(),"/input/")
+  
+for(i in 1:nrow(lst)){
+odir1<-paste0(getwd(),"/input/")
+#PMDA  
+  if(agency=="PMDA"){
+    odir2<-as.character(paste0(getwd(),"/output/programs/",lst$subfolder[i]))
+  }else{
     odir2<-as.character(paste0(getwd(),"/output/programs/"))
-    sour<-as.character(paste0(lst$sourcepath[i],"\\",lst$filename[i]))
-    if(lst$type[i]=="dataset"&lst$type1[i]!="nonmem"){
-      file.copy(from=sour,
-               to=paste0(odir1,conv[i]),overwrite=T)
-    }else{
-      if(lst$type1[i]=="nonmem"){
-        dat <-PCSmisc::read.nonmem.table(paste0(sour))
-        write.csv(dat,paste0(odir1,conv[i]),row.names=F)
-      }else{
-        if(tolower(lst$type[i])%in%c("program","prog")){
-        file.copy(from=sour,to=paste0(odir2,conv[i]),overwrite=T)
-      }}
-    }
+  }  
+  
+sour<-as.character(paste0(lst$sourcepath[i],"\\",lst$filename[i]))
 
-  }}
+
+if(lst$type[i]%in%c("xpt","csv")){
+
+if(grepl("\\.csv$", lst$filename[i])){
+    file.copy(from=sour,
+    to=paste0(odir1,conv[i]),overwrite=T)}
+      
+  if(grepl("\\.xpt$", lst$filename[i])){
+      tt<-as.data.frame(read_xpt(sour))
+      write.csv(tt,paste0(odir1,conv[i]))}
+    
+  if(grepl("\\.html$", lst$filename[i])){
+        library(rvest)
+        url <- sour
+        url %>%
+          read_html %>%
+          html_table(header=T) %>%
+          .[[1]] -> df
+        df<-as.data.frame(df)
+        write.csv(df,paste0(odir1,conv[i]))}
+      
+if(grepl("\\.sas7bdat$", lst$filename[i])){
+  tt<-as.data.frame(read_sas(sour))
+  write.csv(tt,paste0(odir1,conv[i]))} 
+ 
+if(!grepl("\\.sas7bdat$", lst$filename[i])&!grepl("\\.csv$", lst$filename[i])&
+   !grepl("\\.xpt$", lst$filename[i])&!grepl("\\.html$", lst$filename[i])){
+        tt<-read.nonmem.table(sour)
+        write.csv(tt,paste0(odir1,conv[i]))}        
+}else{
+       if(grepl("\\.csv$", lst$filename[i])){  
+        file.copy(from=sour,to=paste0(odir2,"/",rename1),overwrite=T)}
+    
+          if(grepl("\\.xpt$", lst$filename[i])){
+            tt<-as.data.frame(read_xpt(sour))
+            write.table(tt,paste0(odir2,"/",conv[i]),sep=",",row.names=FALSE)}
+            
+            if(grepl("\\.html$", lst$filename[i])){
+              library(rvest)
+              url <- sour
+              url %>%
+                read_html %>%
+                html_table(header=T) %>%
+                .[[1]] -> df
+              tt<-as.data.frame(df)
+              write.table(tt,paste0(odir2,"/",conv[i]),sep=",",row.names=FALSE)
+              }
+            
+            if(grepl("\\.sas7bdat$", lst$filename[i])){
+              tt<-as.data.frame(read_sas(sour))
+              write.table(tt,paste0(odir2,"/",conv[i]),sep=",",row.names=FALSE)}
+    
+    if(!grepl("\\.sas7bdat$", lst$filename[i])&!grepl("\\.csv$", lst$filename[i])&
+       !grepl("\\.xpt$", lst$filename[i])&!grepl("\\.html$", lst$filename[i])){
+      file.copy(from=sour,to=paste0(odir2,"/",conv[i]),overwrite=T)
+    } 
+        
+  }
+}
+}
+
 
 
 #' definelist
@@ -336,70 +417,55 @@ lib.update<-function(prevlib="//certara.com/sites/S02-Cary/Consulting/Projects/r
 
 generateXPT<-function(range.character=NULL){
 
-  read.csv.custom <- function(filename) {
+read.csv.custom <- function(filename) {
     x <- read.csv( filename, stringsAsFactors=F )
     names(x) <- gsub( x=names(x), pattern="[.]", replacement="_" )
     return(x)
   }
-  autoclass<-function (dat)
-  {
-    dat <- chclass(dat, names(dat), "char")
-    var <- names(dat)
-    for (i in var) {
-      numt <- as.numeric(dat[, i])
-      if (all.is.numeric(dat[, i], what = c("test", "vector", "nonnum"),
-                         extras = c(".", "NA", "NaN", " ", "  ", NA))) {
-        dat[, i] <- unlist(as.numeric(as.character(dat[,
-                                                       i])))
-      } else {
-        dat[, i] <- paste0("", unlist(dat[, i]))
-      }
-    }
-    dat
-  }
-
-
-
-  setwd(working.folder)
+setwd(working.folder)
   pathwork<-getwd()
   pathdir<-pathwork
   load.pack1()
 
-
-
   input<-paste0(pathwork,"/input")
   progdir <- "./output/programs"# This folder should contain all program and output .txt
-  outputdir<-paste0(pathdir,"/output/datasets") # This folder for resluted output
+  outputdir<-paste0(pathdir,"/output/datasets") # This folder for resulted output
 
   checkclass=class#NULL or "auto"
 
   lst<- read.csv(paste(pathwork,"list of files.csv",sep="/"),stringsAsFactors=F)
-  lst$type[lst$type!="dataset"]<-"program"
+  
+  lst$type[lst$type=="txt"]<-"program"
+  
   #lst<-lst[lst$xptconvert==1,]
   head(lst)
-  csv<-lst[lst$type=="dataset",]
+  csv<-lst[lst$type%in%c("xpt","csv"),]
+  lstype<-csv$type
   dir<-unlist(paste0(csv$rename,".csv"))
   oriname<-unlist(paste0(csv$filename))
   description<-unlist(paste0(csv$description))
   key<-unlist(paste0(csv$keyvar))
 
   ##PROGRAMS TABLE
-  prog<-unlist(paste0(lst$renam[lst$type=="program"],".txt"))
+  prog<-unlist(paste0(lst$renam[lst$type=="txt"],".txt"))
   progdes<-unlist(paste0(lst$renam[lst$description=="program"]))
   ####### NOT TO BE EDITED ##################################
   location<-paste0("#programs#",prog)
   ###############################
   labdir<-gsub(".csv","",dir)#
+  #labdir<-gsub(".xpt","",labdir)#
   outdir<-dir#
 
   inp<-data.frame(
+    lstype=lstype,
     input=dir,
     lab=labdir,#
     outp=sub(".csv","",outdir),
     prog="NA")#
-
+  
+  dataset<-lst[lst$type%in%c("xpt","csv"),]
   inp1<-data.frame(
-    Dataset=paste0(sub(".csv","",outdir),".xpt"),
+    Dataset=paste0(dataset$rename,".",dataset$type),
     Orinalname=oriname,
     Description=description,#sub(".csv","",dir),  # Label for xpt output, may be required by FDA
     Keyvariables=key,
@@ -411,17 +477,24 @@ generateXPT<-function(range.character=NULL){
   # Convetert csv to XPT
   #############################################
   #detail<- read.xls(paste(sourcepath,definelib,sep="/"), sheet = 1)
-  definelib<-"studydefinelist.csv"
+definelib<-"studydefinelist.csv"
   detail1<- read.csv(paste(pathwork,definelib,sep="/"),stringsAsFactors=F)
   detail<-detail1
   #numkeep<-detail$Variable[detail$Numflg==1]
   detail$"Variable"<-as.character(detail$"Variable")
   detail$Enter.label.here<-capitalize(as.character(detail$Enter.label.here))
   detail$SAS.label<-capitalize(as.character(detail$Enter.label.here))
-
+  subfold<-unlist(paste0(csv$subfolder))
   ################## START LOOP #################
 for (j in 1:nrow(inp)){
-    require(SASxport)
+
+if(agency=="PMDA"){
+    outputdir<-paste0(pathdir,"/output/datasets/",subfold[j])
+    dir.create(outputdir)
+  }else{outputdir<-paste0(pathdir,"/output/datasets")} # This folder for resluted output
+  
+  
+require(SASxport)
     #numkeep<-detail$Variable[detail$Numflg==1]
   #read.csv.custom(paste(pathwork,definelib,sep="/"))
     detail<- read.csv(paste(pathwork,definelib,sep="/"),stringsAsFactors=F)
@@ -430,6 +503,7 @@ for (j in 1:nrow(inp)){
     detail$Enter.label.here<-capitalize(as.character(detail$Enter.label.here))
     detail$SAS.label<-capitalize(as.character(detail$Enter.label.here))
     detail$"Detailed.description"[nchar(detail$Variable)>8]<-paste0(detail$"Detailed.description"[nchar(detail$Variable)>8],". Note: original variable name = ",detail$Variable[nchar(detail$Variable)>8],".")
+
     pkdata <- read.csv(paste(input,inp$input[j],sep="/"),stringsAsFactors = FALSE)
     pkdata <-read.csv.custom(paste(input,inp$input[j],sep="/"))
     pkdata<-chclass(pkdata,names(pkdata),"char")
@@ -441,12 +515,11 @@ for (j in 1:nrow(inp)){
     }
 ##APPLY CHANGES
     #setwd(working.folder)
-    lib<-detail
+lib<-detail
     lib2<-chclass(lib,names(lib),"char")
     lib2$RESOLUTION[is.na(lib$RESOLUTION)|lib$RESOLUTION==""]<-"unchanged"
     #lib$dum<-paste(lib$Variable,lib$file,sep="-")
     #lib2$dum<-paste(lib2$Variable,lib2$file,sep="-")
-
     rem<-lib2[lib2$RESOLUTION=="remove",]
     unch<-lib2[lib2$RESOLUTION=="unchanged",]
     rnm<-lib2[!lib2$RESOLUTION%in%c("unchanged","remove"),]
@@ -465,26 +538,69 @@ for (j in 1:nrow(inp)){
     #write.csv(dc,paste0("./input/",i),row.names=F)}
     #write.csv(lib3,"studydefinelist.csv",row.names=F)
 ###############
-if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Error due to missing label. Please update the define list.",lib3[is.na(lib3$Enter.label.here),c("Variable")]))
+range.fun<-function(data,var){
+if(is.numeric(data[,var])){rg=range(data[,var],na.rm=T)
+rg<-paste0(round(rg[1],3),"-",round(rg[1],3))
+}else{
+if(!is.null(range.character)){
+rg=unique(data[,var])[1:4]
+rg=paste0(rg[1],", ",rg[2],", ",rg[3],", ",rg[4],",")
+rg=gsub("NA,","",rg)}else{rg=""}
+}
+rg
+}
+    
+if(inp$lstype[j]=="csv"){
+  
+write.csv(dc,file.path(outputdir,inp$input[j]),row.names = F)
 
-      detail<-lib3
-      pkdata<-dc
+#Define csv
+detailcsv<-detail
+
+rg1<-NULL
+for(i in names(dc)){
+rg1<-c(rg1,range.fun(data=dc,var=i))
+}
+
+list(str(d1))
+length(unlist(lapply(dc,class)))
+length(d1$Variable)
+
+def<-with(detailcsv[detailcsv$RESOLUTION!="remove",],data.frame(Variable=Variable,SAS.label="",Type=unlist(lapply(dc,class)),
+          Range=rg1,Unit=Unit,Detailed=Detailed.description))
+row.names(def)<-NULL
+head(def)
+write.csv(def,file.path(outputdir,paste(inp$outp[j],"define.csv",sep="")),row.names=F)
+}
+
+if(inp$lstype[j]=="xpt"){
+  require(SASxport)
+  if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Error due to missing label. Please update the define list.",lib3[is.na(lib3$Enter.label.here),c("Variable")]))
+    detail<-lib3
+    pkdata<-dc
     for (h in 1:nrow(detail)){
-      tryCatch(label(pkdata[,paste(detail$Variable[h])])<- paste(detail$SAS.label[h]),error=function(e) NULL )
+    tryCatch(label(pkdata[,paste(detail$Variable[h])])<- paste(detail$SAS.label[h]),error=function(e) NULL )
     }
     label(pkdata)<-inp$lab[j]
-
     rangepkdat <- vardefine(pkdata,maxlevel=10,labels=T,digits=6,vartype=T,exp.csv=T) # same as previous, to export to csv
     detail1<- detail #read.xls(paste(location,"/make defines library.xls",sep=""),sheet=1,method="tab")
     detail1<-detail1[!duplicated(detail1$Variable),]
     detail1<-detail1[detail1$Variable%in%unique(rangepkdat$Variable),]
     rangepkdat<-merge(rangepkdat,detail1[,c("Variable","Unit","Detailed.description")],by=c("Variable","Variable"),all.x=T,sort=F)
+    names(rangepkdat)
     #File name should not exceed 8 characters- NOTE that all variable names will be limited to 8 characters
     name<-as.character(inp$outp[j])
     assign(name,pkdata)
-    file1<-paste(inp$outp[j],".xpt",sep="")
-    sav<-paste0("write.xport(",inp$outp[j],",file=file1,autogen.formats=FALSE)")
-    setwd(outputdir)
+    
+    if(agency=="PMDA"){
+      sf<-paste0(getwd(),"/output/datasets/",subfold[j])
+      dir.create(sf)
+      file1<-paste(sf,"/",inp$outp[j],".xpt",sep="")
+      sav<-paste0("write.xport(",inp$outp[j],",file=file1,autogen.formats=FALSE)")
+    }else{
+      file1<-paste(outputdir,"/",inp$outp[j],".xpt",sep="")
+      sav<-paste0("write.xport(",inp$outp[j],",file=file1,autogen.formats=FALSE)")}
+  #setwd(outputdir)
     eval(parse(text=sav))
 
     require(SASxport)   # to be able to read the xport files
@@ -492,6 +608,7 @@ if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Error due to missing 
     definedataset <- data.frame(Variable=colnames(data))
     range<-vardefine(data,maxlevel=10,labels=T,digits=6,vartype=T,exp.csv=T)
     data1<-data.frame(var=colnames(data))
+    
     rangepkdat$Type<-range$Type
     rangepkdat$Variable<-range$Variable
     rangepkdat$"Code/Range"<-range$"Code/Range"
@@ -500,22 +617,28 @@ if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Error due to missing 
     #rangepkdat$"SAS Variable"<-gsub(rangepkdat$"SAS Variable",pattern="\\_",replacement="XXXX")
     #rangepkdat$"SAS Variable"<- data1
     detach("package:SASxport", unload = T)
-
-    ind<-as.numeric(row.names(rangepkdat[rangepkdat$"Code/Range"=="-",]))
+    
+ind<-as.numeric(row.names(rangepkdat[rangepkdat$"Code/Range"=="-",]))
     if(length(ind[!is.na(ind)])>0){
       rgd<-rangepkdat
     for(i in 1:length(ind)){
-        x<-ifelse(length(unique(data[,ind[i]]))>5,paste0(paste(as.character(unique(data[,ind[i]])[1:5]),collapse=", ",sep=""),", ..."),paste(as.character(unique(data[,ind[i]])),collapse=", ",sep=""))
+        x<-ifelse(length(unique(data[,ind[i]]))>5,paste0(paste(as.character(unique(data[,ind[i]])[1:5]),collapse=", ",sep=""),", ..."),
+        paste(as.character(unique(data[,ind[i]])),collapse=", ",sep=""))
         rgd[ind[i],"Code/Range"]<-x}}else{rgd<-rangepkdat}
     if(!is.null(range.character)){
-      write.csv(rgd,paste(inp$outp[j],"define.csv",sep=""),row.names=F)}else{
-        write.csv(rangepkdat,paste(inp$outp[j],"define.csv",sep=""),row.names=F)
+      write.csv(rgd,file.path(outputdir,paste(inp$outp[j],"define.csv",sep="")),row.names=F)}else{
+        write.csv(rangepkdat,file.path(outputdir,paste(inp$outp[j],"define.csv",sep="")),row.names=F)
       }
-    setwd("../../")
-    getwd()
-  }
-  #END LOOP #
+    }
 }
+  setwd(working.folder)  
+getwd()
+
+}
+  
+
+  #END LOOP #
+
 #END of function
 
 ######################
@@ -534,37 +657,85 @@ if(nrow(lib3[is.na(lib3$Enter.label.here),])>0) stop(list("Error due to missing 
 #' @export
 #' @examples
 #' generateDEF1()
-generateDEF1<-function (title = "Add title here", xpt.location = "./",
-                        prog.location = "../programs/", define.location = "./output/datasets/")
+generateDEF1<-function (title = "Add title here", 
+                        xpt.location = ".\\",
+                        prog.location = "\\programs\\", 
+                        define.location = "\\datasets\\")
 {
+
+  lapply(paste("package:", names(sessionInfo()$otherPkgs), sep=""), 
+         detach, 
+         character.only = TRUE, 
+         unload = TRUE)
+  
+  
+  library(officer)
+  library(flextable)
+
+  ##FUNCTION
+ 
+  multi_hyperlink_text<-function(labels, links){
+    out <- mapply(
+      function(text, url){
+        dat <- hyperlink_text(text, url = url)
+        dat <- split(dat, seq_along(text))
+        as_paragraph(list_values = dat)
+      },
+      text = strsplit(labels, split = ","),
+      url = strsplit(links, split = ","), SIMPLIFY = FALSE, USE.NAMES = FALSE
+          )
+    # the following is necessary to comply with expected
+    # flextable structure!
+  Reduce(append, out)
+  }
+
+  ###############
   setwd(working.folder)
   pathwork <- getwd()
   pathdir <- pathwork
-  sourcepath <- paste0(pathdir, "/functions")
+  
+  #sourcepath <- paste0(pathdir, "/functions")
+  
   input <- paste0(pathdir, "/input")
   progdir <- paste0(pathdir, "/output/programs")
   outputdir <- paste0(pathdir, "/output/datasets")
+  
   lst <- read.csv(paste(pathwork, "list of files.csv",
                         sep = "/"), stringsAsFactors = F)
   head(lst)
-  lst$type[lst$type != "dataset"] <- "program"
-  csv <- lst[lst$type == "dataset", ]
-  dir <- unlist(paste0(csv$rename, ".csv"))
+  
+  lst$type[!lst$type%in%c("csv","xpt")] <- "program"
+  csv <- lst[lst$type%in%c("csv","xpt"), ]
+  dir <- unlist(paste0(csv$rename,".",csv$type))
+  
+  typefile<-unlist(paste0(csv$rename,".",csv$type))
+    
   oriname <- unlist(paste0(csv$filename))
   description <- unlist(paste0(csv$description))
   key <- unlist(paste0(csv$keyvar))
   struct <- unlist(paste0(csv$Structure))
   usedprog <- unlist(paste0(csv$Program))
-  labdir <- gsub(".csv", "", dir)
+  
+  labdir <- csv$rename#gsub(".csv", "", dir)
   outdir <- dir
+  
   inp <- data.frame(input = dir, lab = labdir, outp = sub(".csv",
                                                           "", outdir), prog = "NA")
-  inp1 <- data.frame(Dataset = paste0(sub(".csv", "",
-                                          outdir), ".xpt"), `Original Name` = oriname,
-                     Description = description, Keyvariables = key, Datasetfullname = paste0("#datasets#",
-                                                                                             paste0(sub(".csv", "", outdir), ".xpt")))
+  #
+  
+  if(agency=="PMDA"){
+    inp1 <- data.frame(Dataset =typefile, `Original Name` = oriname,
+                       Description = description, Keyvariables = key, 
+                       Datasetfullname = paste0(xpt.location,lst$subfolder[lst$type%in%c("csv","xpt")],"\\", 
+                        outdir))}else{
+  inp1 <- data.frame(Dataset =typefile, `Original Name` = oriname,
+                     Description = description, Keyvariables = key, 
+                     Datasetfullname = paste0("\\datasets\\", 
+                                              outdir))}
+  
   inp1$Original.Name <- gsub(inp1$Original.Name, pattern = "\\_",
-                             replacement = "XXXX")
+                             replacement = "_")
+  
   chclass <- function(data, var, class = "char") {
     for (i in var) {
       if (class == "num") {
@@ -576,241 +747,491 @@ generateDEF1<-function (title = "Add title here", xpt.location = "./",
     data
   }
 
-  inp1 <- chclass(inp1, names(inp1), "char")
+inp1 <- chclass(inp1, names(inp1), "char")
   tbname <- "Define"
   maintit <- data.frame(tit = c("TABLE OF CONTENTS",
                                 "DATASETS TABLE OF CONTENTS", "VARIABLE DEFINITION TABLES",
                                 "PROGRAMS TABLE OF CONTENTS"))
-  style1 <- textProperties(color = "black", font.size = 12,
-                           font.weight = "bold", font.style = "normal",
-                           underlined = FALSE, font.family = getOption("ReporteRs-default-font"))
-  if ("style.docx" %in% dir("c:/lhtemplate")) {
-    doc <- docx(template = "c:/lhtemplate/style.docx",
-                empty_template = TRUE)
-    doc = map_title(doc, stylenames = c("Heading1",
-                                        "Heading2", "Heading3"))
-  } else {
-    doc <- docx()
-  }
 
-  tabn <- c("Dataset", "Original Name", "Description",
+tabn <- c("Dataset", "Original Name", "Description",
             "Key Variables", "Location")
   hyp0 <- inp1[, "Datasetfullname"]
   inp1[, "Datasetfullname"] <- ""
-  tab = FlexTable(data = inp1[1:nrow(inp1), ], header.columns = FALSE)
-  tab = addHeaderRow(tab, text.properties = textBold(), value = tabn)
-  hyp1 <- paste0(sub(".csv", "", outdir), ".xpt")
 
-  for (i in 1:length(hyp1)) {
-    loc1 <- paste0(xpt.location, hyp1[i])
-    hyp11 <- loc1
-    tab[i, 5] = pot(hyp0[i], hyperlink = hyp11, textBold(color = "#0000EE",
-                                                         underline = F))
+if(agency=="PMDA"){
+      data.location=paste0(xpt.location,lst$subfolder[lst$type%in%c("csv","xpt")],"\\")}else{
+        data.location=paste0(xpt.location)}  
+  
+  hyp1 <- outdir#paste0(sub(".csv", "", outdir), ".xpt")
+  loc1 <- paste0(data.location,hyp1)
+
+names(inp1)<-tabn
+  inp1$Location<-seq(length(loc1))
+
+inp1$A<-hyp0
+inp1$link<-loc1
+
+##DATA LIST TABLE    
+  ft <- flextable(data = inp1)
+  ft <- compose(x = ft, j=5, value = multi_hyperlink_text(hyp0,loc1))
+  ft <- color(x = ft, j =5,color = "#0000EE")
+  ft <- void(ft, ~A+link)
+  ft <- void(ft, ~A+link,part="header")
+  ft<-bold(ft,part="header")
+  ft<-merge_at(ft,j=5:7,part="header")
+
+for(i in 1:nrow(inp1)){
+  ft<-merge_at(ft,j=5:7,i=i)
   }
 
-  if ("logo.png" %in% dir("c:/lhtemplate")) {
-    doc <- doc %>% addImage("c:/lhtemplate/logo.png",
-                            par.properties = parProperties(text.align = "center"),
-                            width = 3.35, height = 1.6)
-  }
-  doc <- doc %>% addParagraph(pot(title, style1), par.properties = parProperties(text.align = "center")) %>%
-    addPageBreak() %>% addParagraph(pot("TABLE OF CONTENTS",
-                                        style1), par.properties = parProperties(text.align = "left")) %>%
-    addTOC(level_max = 3) %>% addPageBreak() %>% addTitle("DATASETS TABLE OF CONTENTS",
-                                                          level = 1) %>% addFlexTable(tab) %>% addPageBreak() %>%
-    addTitle("VARIABLE DEFINITION TABLES", level = 1)
-  tab1data <- inp
+  ft<-border_outer(ft)
+  ft<-border_inner(ft)
+  ft<-font(ft, fontname = "Times New Roman", part = "all")
+  ft<-set_table_properties(ft, width = .7, layout = "autofit")
 
-  #writeDoc(doc,"./output/test.docx")
+  tabxx<-NULL
+  tabxx[[1]]<-ft
+  ft<-NULL
 
-  for (j in 1:nrow(inp)) {
-    doc <- addTitle(doc, as.character(tab1data$outp[j]),
-                    level = 2)
-    data <- read.csv(file.path(outputdir, paste(inp$outp[j],
-                                                "define.csv", sep = "")))
-    data$SAS.Variable <- toupper(data$SAS.Variable)
+  #doc<-read_docx()
+  #START LOOP FOR VARIABLE DEFINE LIST
+tab1data <- inp
+  
+##PREPARE DEFINE TABLE
+subdir<-lst$subfolder[lst$type%in%c("csv","xpt")]
+if(agency=="PMDA"){
+  outputdir1<-paste0(outputdir,"/",subdir)
+}else{outputdir1<-rep(outputdir,nrow(inp))
+}
+
+tabdatset<-NULL
+for (j in 1:nrow(inp)) {
+    t1<-as.character(tab1data$outp[j])
+    
+    data <- read.csv(file.path(outputdir1[j],paste(inp$lab[j],
+                      "define.csv", sep = "")))
+    
+    data[,1] <- toupper(data[,1])
     head(data)
-    tw1a <- as.data.frame(matrix(ncol = length(names(data)),
-                                 nrow = 5))
+  tw1a <- as.data.frame(matrix(ncol = length(names(data)),
+                         nrow = 5))
     tw1a[1:5, 1] <- c(as.character(inp1$Description[j]),
                       "Name of original version: ", "Structure: ",
                       "Dataset: ", "Program: ")
-    tw1a[, 3:6] <- ""
+    tw1a[,2:6] <- ""
     names(tw1a) <- names(data)
-    tw1bn <- c("Variable", "Label", "Type",
-               "Code Range", "Unit", "Detailed Description")
+    
+  tw1bn <- c("Variable", "Label", "Type",
+           "Code Range", "Unit", "Detailed Description")
+  
+  
+  names(tw1a) <- names(data)
     tw1b <- as.data.frame(matrix(ncol = length(names(data)),
-                                 nrow = 1, data = tw1bn))
+                                 nrow = 1, data =tw1bn))
     names(tw1b) <- names(data)
     tw2 <- rbind(tw1a, tw1b, data)
-    tab = FlexTable(data = tw2, header.columns = FALSE)
-    tab[6, 1:6] = textProperties(font.weight = "bold")
-    tab[1, 1] = textProperties(font.weight = "bold")
-    tab[4:5, 2] = textProperties(color = "blue")
-    tab = spanFlexTableColumns(tab, i = 1:5, from = 1, to = 6)
-    tab = spanFlexTableColumns(tab, i = 2, from = 1, to = 6)
-    tab = spanFlexTableColumns(tab, i = 3, from = 1, to = 6)
-    tab[2, 1, text.properties = textNormal(color = "black")] = as.character(inp1$Original.Name[j])
-    tab[3, 1, text.properties = textNormal(color = "black")] = as.character(struct[j])
-    hyp2 <- as.character(inp1$Dataset[j])
-    hyp11 <- paste0(xpt.location, as.character(inp1$Dataset[j]))
-    tab[4, 1] = pot(hyp2, hyperlink = hyp11, textBold(color = "#0000EE",
-                                                      underline = F))
-    if (usedprog[j] == "NA" | usedprog[j] == "") {
-      tab[5, 1] = as.character(usedprog[j])
-    }    else {
-      hyp2 <- as.character(paste0(usedprog[j], ".txt"))
-      hyp11 <- paste0(prog.location, hyp2)
-      tab[5, 1] = pot(hyp2, hyperlink = hyp11, textBold(color = "#0000EE",
-                                                        underline = F))
+    names(tw2)
+    #------->header
+    dts1 <-as.character(inp1$Dataset[j]) #gsub(".xpt","",as.character(inp1$Dataset[j]))
+    orin= as.character(inp1$"Original Name"[j])
+    struc= as.character(struct[j])
+    dts2 <- as.character(inp1$Dataset[j])
+    link1 <- as.character(inp1$link[j])#color = "#0000EE"
+    no_prog<-usedprog[j] == "NA" | usedprog[j] == ""
+  if (no_prog) {
+      prog = as.character(usedprog[j])
+      link2 <-as.character(usedprog[j])
+    } else {
+      prog <- as.character(paste0(usedprog[j], ".txt"))
+      link2 <- paste0(prog.location,as.character(paste0(usedprog[j], ".txt")))
     }
-    border_ <- borderProperties(style = "none")
-    tab[1:4, 1:6, side = "bottom"] <- border_
-    doc <- addFlexTable(doc, tab)
-    doc <- doc %>% addPageBreak()
+
+    names(tw2)
+    #------->header
+tw2$B<-"."
+tw2$C<-"."
+    head(tw2)
+names(tw2)[2]<-"SAS.Label"    
+    tw2$B[4:5]<-c(dts1,"")
+    tw2$C[4:5]<-c(link1,"")
+    tw2$SAS.Label[c(1:3)]<-c("",orin,struc)
+    tw2$SAS.Label[c(4:5)]<-c(1,"")
+    head(tw2)
+
+if (!no_prog) {
+      tw2[2,5]<-2
+      tw2$B[5]<-c(prog)
+      tw2$C[5]<-c(link2)
+    }
+
+    tw2$B<-as.character(tw2$B)
+    tw2$C<-as.character(tw2$C)
+head(data.frame(tw2))
+length(tw2$SAS.Variable)
+length(tw2$Detailed.description)
+names(tw2)
+#tw2$B<-NULL
+#tw2$C<-NULL
+head(tw2)
+ft1<- flextable(data =tw2)
+    if(no_prog){
+      ft1 <- compose(x = ft1, j=2,i=4, value = multi_hyperlink_text(B,C))
+      ft1 <- color(x = ft1,i=4, j =2,color = "#0000EE")
+    }else{
+      ft1 <- compose(x = ft1, j=2,i=4:5, value = multi_hyperlink_text(B,C))
+      ft1 <- color(x = ft1,i=4:5, j =2,color = "#0000EE")
+    }
+
+    ft1<-bold(ft1,i=1,j=1:2)
+    ft1<-bold(ft1,i=6)
+    ft1<-bold(ft1,i=4,j=2)
+    ft1<-bold(ft1,i=5,j=2)
+    ft1 <- delete_part(x = ft1, part = "header")
+    ft1 <- void(x = ft1,~B+C, part = "body")
+    for(i in 2:5){
+      ft1<-merge_at(ft1,j=2:7,i=i)
+    }
+
+    ft1<-merge_at(ft1,j=1:8,i=1)
+    ft1<-merge_at(ft1,j=2:8,i=2)
+    ft1<-merge_at(ft1,j=2:8,i=3)
+    ft1<-merge_at(ft1,j=2:8,i=4)
+    ft1<-merge_at(ft1,j=2:8,i=5)
+
+    lr<-nrow(data)+6
+    for(i in 6:lr){
+      ft1<-merge_at(ft1,j=6:8,i=i)
+    }
+    bord<-fp_border(color="black")
+    #ft1<-border(ft1,border.right=bord)
+    ft1<-border_outer(ft1,border=bord)
+    #ft1<-border_outer(ft1,i=2:4,j=1:2,border=bord)
+    ft1<-hline(ft1,i=5,border=bord)
+    ft1<-vline(ft1,i=2:5,j=2,border=bord)
+    ft1<-vline(ft1,i=1,j=1,border=bord)
+    ft1<-vline(ft1,j=1:6, i=6:lr,border=bord)
+    ft1<-hline(ft1, i=6:lr,border=bord)
+    ft1<-font(ft1, fontname = "Times New Roman", part = "all")
+    #ft1<-set_table_properties(ft1, width = .7, layout = "autofit")
+    tabdatset[[j]]<-ft1
+    ft1<-NULL
   }
+
+###PREPARE PROGRAMS LIST
 prog <- unlist(paste0(lst$renam[lst$type == "program"],
-                        ".txt"))
+              ".txt"))
   progdes <- unlist(paste0(lst$description[lst$type == "program"]))
-  origprog <- unlist(paste0(lst$filename[lst$type != "dataset"]))
-  location <- paste0("#programs#", prog)
-  doc <- addTitle(doc, "PROGRAMS TABLE OF CONTENTS",
-                  level = 1)
+  origprog <- unlist(paste0(lst$filename[!lst$type%in%c("csv","xpt")]))
+
+  #location <- paste0("\\programs\\", prog)
   dir(progdir)
   include <- paste0(lst$rename[lst$progNo != "" & !is.na(lst$progNo)],
                     ".txt")
   IOD <- lst[lst$progNo %in% lst$progNo[lst$progNo != "" &
-                                          !is.na(lst$progNo)] & !is.na(lst$progNo), ]
+        !is.na(lst$progNo)] & !is.na(lst$progNo), ]
   ind <- lst[rownames(lst) %in% rownames(IOD), ]
   prono <- lst[rownames(lst) %in% rownames(IOD), "progNo"]
+  
+#FOR FDA
+if (agency!="PMDA") {
+  subdir<-lst$subfolder[lst$type%in%c("program")]
+  #if(agency=){
+  # location<-paste0(prog.location,subdir)
+  location <- paste0(prog.location,prog)#else{location <- paste0(prog.location,prog)} 
+   
+if(length(origprog)!=0){
+  
+    tab3data <- data.frame(Original = origprog, Program = prog,
+                           Description = progdes, Location = location)
 
-
-  if (nrow(IOD[IOD$type=="program",]) > 0) {
-    prog <- unlist(paste0(ind$renam[ind$type != "dataset"],
-                          ".txt"))
-    progdes <- unlist(paste0(ind$Purpose[ind$type != "dataset"]))
-    origprog <- unlist(paste0(ind$filename[ind$type != "dataset"]))
-    software.used <- unlist(paste0(ind$Software.version[ind$type !=
-                                                          "dataset"]))
+    hyp2 <- paste0("..",tab3data[, "Location"])
+   
+    hyp11 <- hyp0#paste0(prog.location, hyp1[, "Program"])
+   
+    tab3data$D<-tab3data[, "Location"]#gsub("..","",hyp0)#"test"#hyp0
+    
+    tab3data$E<-hyp2#hypmod
+    
+    ft2 <- flextable(data = tab3data)
+    ft2 <- compose(x=ft2,j=4,value = multi_hyperlink_text(D,E))
+    
+    ft2 <- color(x = ft2,j =4,color = "#0000EE")
+    ft2 <- void(x = ft2,~D+E, part = "all")
+    for(i in 1:nrow(tab3data)){
+      ft2<-merge_at(ft2,j=4:6,i=i)
+    }
+    ft2<-merge_at(ft2,j=4:6,part="header")
+    ft2<-bold(ft2,part="header")
+    bord<-fp_border(color="black")
+    #ft1<-border(ft1,border.right=bord)
+    ft2<-border_outer(ft2,border=bord)
+    ft2<-border_inner(ft2,border=bord)
+    bord<-fp_border(color="black")
+    ft2<-vline(ft2,j=4,border=bord)
+    ft2<-font(ft2, fontname = "Times New Roman", part = "all")
+    ft2<-set_table_properties(ft2)
+    }else{tab3data <- data.frame(Original = "origprog", Program = "prog",
+                                 Description = "progdes", Location = "location")
+    ft2 <- flextable(data = tab3data)}
+    ft2<-set_table_properties(ft2) 
+}
+#FOR PMDA
+if (agency=="PMDA") {
+  lstxt<-lst[lst$type=="program",]
+    prog <- unlist(paste0(ind$renam[ind$type=="program"],".txt"))
+    progdes <- unlist(paste0(ind$Purpose[ind$type=="program"]))
+    origprog <- unlist(paste0(ind$filename[ind$type=="program"]))
+    software.used <- unlist(paste0(ind$Software.version[ind$type=="program"]))
     tab3data <- data.frame(Program_Original_names = "",
                            Description = "", Input_Output_log_file_original_names = "")
-    tab<-as.data.frame(matrix(ncol=3,nrow=length(origprog)))
-    names(tab)<-c("Program_Original-names","Description","Input_Output_log_file_original_names")
+    tab<-as.data.frame(matrix(ncol=7,nrow=length(origprog)))
+    names(tab)<-c("Program#Original names","Description#Purpose","Input#Output#log file#original_names","A","B","C","D")
+    subfolder<-lst$subfolder[lst$type=="program"]
     #tab = FlexTable(data=tab3data, header.columns = T)
-    tab = FlexTable(tab)
 
+table1<-NULL        
 for (i in 1:length(origprog)) {
-      op <- paste0(prog.location, prog[i])
-      space = "\n "
-
-      tab[i, 1] = pot(prog[i], hyperlink = op, textBold(color = "#0000EE",
-                                                           underline = F)) + "\n(original:" +
-        pot(origprog[i]) + ")"
-      tab[i, 2] = pot("Software used: ", textBold()) +
-        software.used[i] + space + pot("Purpose: ",
-                                       textBold()) + progdes[i]
-
-      lst1<-lst$filename[lst$filename%in%origprog[i]]
-      io1 <- lst[stringr::str_detect(lst$proNo.input[lst$filename==lst1],prono), ]
-      io2 <- lst[stringr::str_detect(lst$proNo.output[lst$filename==lst1],prono), ]#lst[grep(prono[i], lst$proNo.output[i]), ]
-      io3 <- lst[stringr::str_detect(lst$progNo.dependent[lst$filename==lst1],prono), ]#lst[grep(prono[i], lst$progNo.dependent),]
-
-      if (nrow(io1) == 0) {
-        #zz0 <- ""
-        zz0 = pot("", textBold())+ "\n "
+  tab1<-tab[1,]
+  tab2<-tab[1,]
+      op <- paste0(".\\",subfolder,"\\", prog[i])
+      space = "\n  "
+      tab1[,1] = prog[i]#paste(prog[i], "\n(original:",
+                       #rigprog[i],")")
+      tab1[,"A"]<-prog[i]
+      tab1[,"B"]<-paste0(".\\",lstxt$subfolder[i],"\\",prog[i])
+      tab1[,2]<-paste0("Purpose:\n",lstxt$description[i])
+      tab2[,1]<-paste0("\n(original:",
+                  origprog[i],")")
+      tab2[,2]<-paste0("Software Version:\n",lstxt$Software.version[i])
+      #tab[i,2] = paste("Software used:\n ",software.used[i],"\n\nPurpose:\n ", progdes[i])
+      lst$type[lst$type=="program"]<-"txt"
+      io1 <- lst[grep(prono[i],lst$proNo.input), ]
+      io2 <- lst[grep(prono[i],lst$proNo.output), ]
+      io3 <- lst[grep(prono[i],lst$progNo.dependent),]
+      tab1<-rbind(tab1,tab2)
+           
+if (nrow(io1) == 0) {
+  tab3<-tab[i,]
+  tab3[,3] <- "[INPUT]"
       } else {
-        zz0 <- "\n "
+        tab3<-tab[i,]
+        tab3[,3] <- "[INPUT]"
+        
         for (io in 1:nrow(io1)) {
           ext1 <- ifelse(io1$type[io] == "program",
                          ".txt", ".xpt")
           txtins <- paste0(io1$rename[io], ext1)
+
           ext2 <- ifelse(io1$type[io] == "program",
-                         prog.location, xpt.location)
+                         "./programs/", "./datasets/")
           insert <- paste0(ext2, txtins)
-          orf <- paste0("(original:", io1$filename[io],
+          orf <- paste0("(original:",io1$filename[io],
                         ")")
           col = "#0000EE"
-          space = "\n "
-
-          zz0 <- zz0 + pot(txtins, hyperlink = insert, textBold(color = "#0000EE",
-                                                                 underline = F)) +space +
-            pot(orf, textNormal()) + space
+          space = "\n  "
+          
+          fn<-paste0(io1$rename[io],".",io2$type[io])
+          tab4<-tab[i,]
+          tab4[,"C"]<-fn
+          if(io1$type[i]%in%c("csv","xpt")){
+          tab4[,"D"]<-paste0("..\\datasets\\",io1$subfolder[io],"\\",fn)}else{
+          tab4[,"D"]<-paste0(".\\",io1$subfolder[io],"\\",fn) 
+          }
+          tab4a<-tab[i,]
+          tab4a[,3]<-orf
+          tab3<-rbind(tab3,tab4,tab4a)
         }
       }
-      if (nrow(io2) == 0) {
-        zz1 = pot("", textBold())
-      }      else {
-        zz1 <- ""
+if (nrow(io2) == 0) {
+        tab4<-tab[i,]
+        tab4[,3] <- "[OUTPUT]"
+      } else {
+        tab4<-tab[i,]
+        tab4[,3] <- "[OUTPUT]"
+        
         for (io in 1:nrow(io2)) {
           ext1 <- ifelse(io2$type[io] == "program",
                          ".txt", ".xpt")
           txtins <- paste0(io2$rename[io], ext1)
+          
           ext2 <- ifelse(io2$type[io] == "program",
-                         prog.location, xpt.location)
+                         "./programs/", "./datasets/")
           insert <- paste0(ext2, txtins)
-          orf <- paste0("(original:", io2$filename[io],
+          orf <- paste0("(original:",io2$filename[io],
                         ")")
           col = "#0000EE"
-          space = "\n "
-          zz1 <- zz1 + pot(txtins, hyperlink = insert, textBold(color = "#0000EE",
-            underline = F)) + space +
-            pot(orf, textNormal()) + space
+          space = "\n  "
+          
+          fn<-paste0(io2$rename[io],".",io2$type[io])
+          tab4b<-tab[i,]
+          tab4b[,"C"]<-fn
+          if(io2$type[i]%in%c("csv","xpt")){
+            tab4b[,"D"]<-paste0("..\\datasets\\",io2$subfolder[io],"\\",fn)}else{
+              tab4b[,"D"]<-paste0(".\\",io2$subfolder[io],"\\",fn) 
+            }
+          tab4c<-tab[i,]
+          tab4c[,3]<-orf
+          tab4<-rbind(tab4,tab4b,tab4c)
         }
       }
-      if (nrow(io3) == 0) {
-        zz2 = pot("", textBold())
-      }      else {
-        zz2 <- "\n "
+           
+ if (nrow(io3) == 0) {
+        tab5<-tab[i,]
+        tab5[,3] <- "[DEPENDENCY]"
+      } else {
+        tab5<-tab[i,]
+        tab5[,3] <- "[DEPENDENCY]"
+        
         for (io in 1:nrow(io3)) {
           ext1 <- ifelse(io3$type[io] == "program",
                          ".txt", ".xpt")
           txtins <- paste0(io3$rename[io], ext1)
+          
           ext2 <- ifelse(io3$type[io] == "program",
-                         prog.location, xpt.location)
+                         "./programs/", "./datasets/")
           insert <- paste0(ext2, txtins)
-          orf <- paste0("(original:", io3$filename[io],
+          orf <- paste0("(original:",io3$filename[io],
                         ")")
           col = "#0000EE"
-          space = "\n "
-          zz2 <- zz2 + pot(txtins, textNormal()) + space +
-            pot(orf, textNormal()) + space
+          space = "\n  "
+          
+          fn<-paste0(io3$rename[io],".",io3$type[io])
+          tab4b<-tab[i,]
+          tab4b[,"C"]<-fn
+          if(io3$type[i]%in%c("csv","xpt")){
+            tab4b[,"D"]<-paste0("..\\datasets\\",io3$subfolder[io],"\\",fn)}else{
+              tab4b[,"D"]<-paste0(".\\",io3$subfolder[io],"\\",fn) 
+            }
+          tab4c<-tab[i,]
+          tab4c[,3]<-orf
+          tab5<-rbind(tab5,tab4b,tab4c)
         }
       }
-      head(tab)
-
-      tab[i, 3] = pot("[Input]", textBold()) + "\n" +
-        zz0 + "\n " + pot("[Output]", textBold()) +
-        "\n " + zz1 + "\n " + pot("[Dependency]",
-                                    textBold()) + "\n" + zz2
-    }
-  } else {
-    if (length(dir(progdir)) >= 1 & nrow(IOD) == 0) {
-      tab3data <- data.frame(Original = origprog, Program = prog,
-                             Description = progdes, Location = location)
-    } else {
-      tab3data <- data.frame(Original = "", Program = "",
-                             Description = "", Location = "")
-    }
-  }
-
-  if (nrow(IOD) == 0) {
-    orig <- origprog
-    hyp0 <- paste0("#programs#", tab3data[, "Program"])
-    hyp1 <- tab3data
-    hyp2 <- hyp1[, "Location"]
-    hyp1[, "Location"] <- ""
-    tab = FlexTable(data = hyp1[1:nrow(hyp1), ], header.columns = FALSE)
-    tab = addHeaderRow(tab, text.properties = textBold(),
-                       value = as.character(names(tab3data)))
-    for (i in 1:length(hyp0)) {
-      hyp11 <- paste0(prog.location, hyp1[, "Program"][i])
-      tab[i, 4] = pot(hyp0[i], hyperlink = hyp11, textBold(color = "#0000EE",
-                                                           underline = F))
-    }
-  }
-  doc <- addFlexTable(doc, tab)
-  writeDoc(doc, paste0(define.location, "define.docx"))
+table1<-rbind(table1,tab1,tab3,tab4,tab5)
 }
+
+table1$rn<-seq(nrow(table1))
+a<-as.numeric(table1$rn[table1$A!=""])
+a<-a[!is.na(a)]
+b<-as.numeric(table1$rn[table1$C!=""])
+b<-b[!is.na(b)]
+
+table1$rn1<-ifelse(table1$A=="","NA",table1$A)
+c<-as.numeric(table1$rn[!is.na(table1$rn1)])-1
+
+c2<-as.numeric(table1$rn[!is.na(table1$rn1)])-1
+c1<-as.numeric(table1$rn[!is.na(table1$rn1)])
+lastline<-as.numeric(nrow(table1))
+c2<-c(c2[-1],lastline)
+
+pm <- flextable(data =table1)
+pm <- compose(x=pm,j=1,i=a,value = multi_hyperlink_text(A,B))
+pm <- compose(x=pm,j=3,i=b,value = multi_hyperlink_text(C,D))
+pm <- color(x = pm,i=a, j =1,color = "#0000EE")
+pm <- color(x = pm,i=a, j =1,color = "#0000EE")
+pm <- color(x = pm,i=b, j =3,color = "#0000EE")
+pm <- hline(x = pm,i=c[c!=0])
+pm <- vline(x = pm)
+pm<-border_outer(pm,border=bord)
+#pm<-border_inner(pm,border=bord)
+pm<-bold(pm,part="header")
+pm<-font(pm, fontname = "Times New Roman", part = "all")
+pm<-set_table_properties(pm, width = .8, layout = "autofit")
+pm<-delete_columns(pm,4:9)
+pm<-merge_v(pm,j=1:3, part = "body")
+}
+  
+  
+#PREPARE DEFINE WORD DOCUMENT
+img_in_par <- fpar(
+    #external_img(src ="c:/lhtemplate/logo.png",width=3.5,height=1.44),
+  fp_p = fp_par(text.align = "center"))
+  text_style <- fp_text(font.size =14,bold=T,font.family ="Times New Roman")
+  text_style1 <- fp_text(font.size =12,bold=T,font.family ="Times New Roman")
+  par_style <- fp_par(text.align = "center")
+
+##Create WORD DOC
+#DEFINE
+doc<-read_docx()
+  an_fpar <- fpar("", run_linebreak())
+  doc <- body_add_fpar(doc,fpar(ftext(title, prop = text_style), fp_p = par_style ))
+  doc <- body_add(doc, an_fpar)
+  doc <-body_add_break(doc)
+  t1<-fpar(ftext("TABLE OF CONTENTS", prop = text_style1))
+  #doc <- body_add_par(doc,"DATASETS TABLE OF CONTENTS",style = c("heading 1"))
+  doc <- body_add_fpar(doc,t1,style = c("heading 1"))
+  doc <- body_add_toc(doc,level=2)
+  doc <-body_add_break(doc)
+  t1<-fpar(ftext("DATASETS TABLE OF CONTENTS", prop = text_style))
+  #doc <- body_add_par(doc,"DATASETS TABLE OF CONTENTS",style = c("heading 1"))
+  doc <- body_add_fpar(doc,t1,style = c("heading 1"))
+  doc <- body_add(doc, an_fpar)
+  tabx1<-tabxx[[1]]
+  tabx1<-autofit(tabx1)
+  doc <- body_add_flextable(doc,tabx1,align="center",split=T)
+  doc <-body_add_break(doc)
+  #fname<-paste0(define.location,"define.docx")
+ # print(doc,fname)
+  #doc<-read_docx("c:/lhtemplate/style.docx")
+  t1<-fpar(ftext("VARIABLE DEFINITION TABLES", prop = text_style))
+  #doc <- body_add_par(doc,"VARIABLE DEFINITION TABLES",style = c("heading 1"),font.family ="Times New Roman")
+  doc <- body_add_fpar(doc,t1,style = c("heading 1"))
+  #doc <- body_add(doc, an_fpar)
+  
+for(i in 1:nrow(inp)){
+  doc <-body_add_break(doc)
+    t1<-as.character(tab1data$outp[i])
+    t1<-fpar(ftext(t1, prop = text_style1))
+    #doc <- body_add_par(doc,t1,style = c("heading 2"))
+    doc <- body_add_fpar(doc,t1,style = c("heading 2"))
+   # doc <- body_add(doc, an_fpar)
+    tabx<-tabdatset[[i]]
+    #tabx<-autofit(tabx)
+    doc <- body_add_flextable(doc,tabx)
+    #doc1 <-body_add_break(doc)
+  }
+
+#fname<-paste0(".\\output",define.location,"define.docx")
+#print(doc,fname)
+  
+if(agency!="PMDA"){
+    an_fpar <- fpar("", run_linebreak())
+    doc <- body_add_fpar(doc,fpar(ftext(title, prop = text_style), fp_p = par_style ))
+    doc <- body_add(doc, an_fpar)
+    doc <-body_add_break(doc)
+   # doc<-read_docx()
+    t1<-fpar(ftext("PROGRAMS TABLE OF CONTENTS", prop = text_style1))
+    #doc <- body_add_par(doc,t1,style = c("heading 2"))
+    doc <- body_add_fpar(doc,t1,style = c("heading 1"))
+    #doc <- body_add_par(doc,"PROGRAMS TABLE OF CONTENTS",style = c("heading 1"))
+    doc <- body_add(doc, an_fpar)
+    ft2<-autofit(ft2)
+    doc2 <- body_add_flextable(doc,ft2,align="center",split=T)
+    doc2<-body_end_section_landscape(doc2, w = 21/2.54, h = 29.7/2.54)
+    fname<-paste0(".\\output",define.location,"define.docx")
+    print(doc2,fname)
+    }
+
+#fname<-paste0(".\\output\\datasets\\define.docx")
+#print(doc1,fname)
+  
+  
+if(agency=="PMDA"){
+    doc3<-read_docx()
+    doc3 <- body_add_par(doc3,"PROGRAMS TABLE OF CONTENTS",style = c("heading 1"))
+    doc3 <- body_add(doc3, an_fpar)
+    pm<-autofit(pm) 
+    doc3 <- body_add_flextable(doc3,pm)
+fname<-paste0(".\\output\\datasets\\","define.docx")
+doc<-body_end_section_landscape(doc, w = 21/2.54, h = 29.7/2.54)
+print(doc,fname)
+
+fname<-paste0(".\\output\\programs\\program_procedure.docx")
+doc3<-body_end_section_landscape(doc3, w = 21/2.54, h = 29.7/2.54)
+print(doc3,fname)
+}
+}
+
 
 #' clearALL
 #'
@@ -853,14 +1274,27 @@ clearALL<-function(...){
 cleardefCSV1<-function(...){
   pathwork<-getwd()
   pathdir<-pathwork
-  outputdir<-paste0(pathdir,"/output/datasets") # This folder for resluted output
-  frm<-dir(outputdir)
-  index<-c(grep("csv",frm),grep("tex",frm))
-  frm<-frm[index]
-  for(i in frm){
-    file.remove(paste(outputdir,i,sep="/"))
+  dir(pathwork)
+  lst<-read.csv(paste0(pathdir,"/","list of files.csv"))
+  if(agency=="PMDA"){
+    for(i in 1:length(lst$subfolder)){
+      outputdir<- paste0(pathdir,"/output/datasets/",lst$subfolder[i])
+      frm<-dir(paste0(pathdir,"/output/datasets/",lst$subfolder[i]))
+      index<-grep("define.csv",frm)
+      frm<-frm[index]
+      for(j in frm){
+        file.remove(paste(outputdir,j,sep="/"))
+      }}
+  }else{
+    outputdir<- paste0(pathdir,"/output/datasets/")
+    frm<-dir(paste0(pathdir,"/output/datasets/"))
+    index<-grep("define.csv",frm)
+    frm<-frm[index]
+    for(j in frm){
+      file.remove(paste(outputdir,j,sep="/"))
+    }
   }
-}
+  }
 
 
 #' helps
@@ -894,14 +1328,16 @@ cleardefCSV1<-function(...){
 
 helps<-function(...){
   x<-data.frame(stepBYstep=seq(8),
-                Procedure=c("require(xptdef2)",
+                Procedure=c("require(xptdef3)",
                             "working.folder= enter full path",
-                            "step1(working.folder)",
-                            "EDIT list of files.csv then save",
-                            "define.library= path/libraryfile.csv",
+                            "agency=PMDA or FDA",
+                            "step1()",
+                            "EDIT list of files.csv and save (see html). Note: additional fields required to be completed for PMDA submission:
+                            subfolder/progNo/Software.version/Purpose/proNo.input/proNo.output/progNo.dependent",
+                            "define.library=no",
                             "step2()",
-                            "EDIT studydefinelist.csv and save.",
-                            "step3(title)"))
+                            "EDIT studydefinelist.csv and save",
+                            "step3()"))
   print(x)
 }
 
@@ -921,21 +1357,57 @@ step1<-function(){
   setwd(working.folder)
   if(!"list of files.csv"%in%dir()){
     lf<-data.frame(
-      filename=c("ex:data.csv","ex:pattab","ex:basemod.txt","ex:setting.R"),
-      type=c("ex:dataset","ex:dataset","ex:program","ex:program"),
-      rename=c("ex:pkdata","ex:residual","ex:basemodel","setting"),
-      keyvar=c("ex:ID,TIME","ex:ID,TIME","not required for program","not required for program"),
-      Structure=c("ex:per subject per time point","ex:per subject per time point","not required for program","not required for program"),
-      Program=c("","ex:basemod","",""),
-      description=c("ex: PK dataset","ex:residual","ex:NONMEM base model","Dependency R script"),
-      progNo=c("","","PMDA ex:#1a","PMDA ex:#1b"),
-      Software.version=c("","","PMDA ex:NONMEM VERSION 7.4.3","PMDA ex:R VERSION 3.0.0"),
-      Purpose=c("","","PMDA ex:NONMEM control file","PMDA ex:R script for tranforming..."),
-      proNo.input=c("PMDA ex:#1a#1b","","",""),
-      proNo.output=c("","PMDA ex:#1a","",""),
-      progNo.dependent=c("","","","ex:#1a"),
-      sourcepath=c("full path in window format","full path in window format","full path in window format","full path in window format"))
-    write.csv(lf,"list of files.csv",row.names =F)
+      filename=c("Enter original file name: ex: data.csv, pattab.tab, basemod.ctl,GOF.R, vpcoutput.tab, etc."),
+      type=c("ASSIGNED file type to be converted. Ex: txt for program in text or csv or xpt for dataset (required define for each variable post STEP2()). 
+             Note CSV is accepted. At STEP3(), the files will be converted to the assigned format"),
+      rename=c("RENAME file (FDA, <=8 character PMDA, original names are acepted). Used in STEP2()"),
+      keyvar=c("OPTIONAL: leave blank if txt or enter unique variables per row ex: ID,TIME"),
+      Structure=c("OPTIONAL: leave blank if txt or enter unique variables per row ex: per subject per time point"),
+                 
+      Program=c("Leave blank if no progragram or script was used to generate the dataset. Else, enter the script or program name (renamed)"),
+      description=c("ENTER DESCRIPTION ex: PK dataset, NONMEM residual output, NONMEM base model, GOF and VPC R script
+                    VPC output, etc."),
+      subfolder=c("ENTER the names of folder for each item. Required by PMDA. ex: 1_pk_data, 2_base_model,3_covariates, etc."),
+      progNo=c("ENTER label or ID for each item. These flags will be used to map each item as input/output/or dependency.
+               It should be unnested format, example:#A00,#A01,#B01,#A10. Nested labels will cause duplication or mislabeling. 
+               Ex:#A1 and #A12 are nested"),
+      Software.version=c("ENTER software version (Pheonix, R, NONMEM,etc.) for text model or control file or R script. 
+                         Ex: NONMEM VERSION 7.4.3, R VERSION 3.0.0"),
+      Purpose=c("ENTER the purpose of each program used to generate TFL for the study report. Ex: NONMEM control file of base model,
+                R script for generating GOF and VPC plots for Figures 1 and 2 and Table 1 of the report (title?)"),
+      proNo.input=c("MAP the input for each program with the progNo, EX: if pkdatset (progNo #A00) is the input of base model (progNo #A02) and 
+                  GOF R script (progNo #A03), then enter #A02#A03 in the #A00 row "),
+      proNo.output=c("MAP the output for each program with the progNo, EX: if basetab (progNo #A00) and vpctab (progNo #A01) are the outputs of base model (progNo #A02) and 
+                  then enter #A00#A01 in the #A02 row"),
+      progNo.dependent=c("MAP the dependency for each program with the progNo, EX: if lhtool2 (progNo #A00) is R script used in program to generate GOF figures (progNo #A02)
+                         then enter #A00 in the #A02 row"),
+      sourcepath=c("ENTER location of each item (full path from File explorer). 
+                   At step2(), each file will be copied and converted to the assigned folders"))
+    flextable::save_as_html(flextable::flextable(lf),path="./list_of_file_helps.html")
+
+templ<-data.frame(filename= c("pd_twolast.csv","run9_Base_2CPT.mod","run9_Base_2CPT.lst","run9_Base_2CPT.tab",              
+                      "run12_Base_2CPT_FULL_rm_AGEF.mod", "run12_Base_2CPT_FULL_rm_AGEF.lst", "run12_Base_2CPT_FULL_rm_AGVC.mod", "run12_Base_2CPT_FULL_rm_AGVC.lst",
+                     "list_of_file_helps.html","pkdatbas.xpt"), 
+                     type=c("csv", "txt", "txt", "csv", "txt", "txt", "txt" ,"txt" ,"csv" ,"csv"),
+                     rename=c("erdata","baspkmod","baspklst","baspktab","run12_Base_2CPT_FULL_rm_AGEFmod",
+"run12_Base_2CPT_FULL_rm_AGEFlst", "run12_Base_2CPT_FULL_rm_AGVCmod", "run12_Base_2CPT_FULL_rm_AGVClst", "testhtml","testsas" ),
+keyvar=c("ID", "","","","","","","","ID", "ID"),
+Structure=c("per subject", "","","","","","","","per subject", "per subject"),
+Program=c("","","","","","","","","",""),
+description=c("Exposure-Response dataset","NONMEM base PK model","NOMEM base model output",                       
+           "Testing NONMEM table to csv","NONMEM covariate model - Age on fraction Frel","NONMEM covariate output - Age on fraction Frel",
+"NONMEM covariate model - Age on Vc/F","NONMEM covariate output - Age on Vc/F","Testing conversion html to csv",                
+"Testing conversion xpt to csv"),
+subfolder=c("pkdata","basemod","basemod","basemod","covariat", "covariat", "covariat", "covariat", "covariat", "covariat"),
+progNo=c("#A01 ", "#A02 ", "#A03 ", "#A10 ", "#A20 ", "#A30 ", "#10B ", "#C10 ", "#C01 ","#C02 "),
+Software.version=c("","NOMEM version 7", "","","","","","","",""),
+Purpose=c("","testing purpose" ,"testing purpose", "testing purpose" ,"testing purpose", "testing purpose" ,"testing purpose" ,"testing purpose", "testing purpose",
+         "testing purpose"),
+proNo.input=c("#A02#A20", "","","","","","","","",""),
+proNo.output=c(rep("",8),"#A02#A20", "#A02#A20"),
+progNo.dependent=c("","","","","","","#A30", "","",""),
+sourcepath=rep("C:\\Users\\lpheng\\Certara\\PTCT-PMX-PTC923-4357 - Project Data\\",10))
+write.csv(templ,"list of files.csv",row.names =F)
   }}
 
 
@@ -1000,7 +1472,10 @@ step2<-function(){
 #' @export
 #' @examples
 #' step4(title="Add title here")
-step3<-function(project_title="Project Title",xpt_location="./",prog_location="../programs/",define_location="./output/datasets/",
+
+step3<-function(project_title="Project Title",xpt_location = ".\\",
+                prog_location = "\\programs\\", 
+                define_location = "\\datasets\\",
                 range_character="yes"){
   class="auto"
   generateXPT(range.character=range_character)

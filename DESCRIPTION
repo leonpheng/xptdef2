@@ -1,5 +1,5 @@
-Package: xptdef2
-Title: Create XPT and Define document
+Package: xptdef3
+Title: Create e-Submission Package for PMDA or FDA 
 Version: 3.0
 Authors@R: 
     person(given = "Leon",
@@ -7,5 +7,5 @@ Authors@R:
            role = c("aut", "cre"),
            email = "lhpheng@example.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: This package will convert csv dataset to xpt, create output folders and define document in word using Officer.
+Description: e-Submission Package R script
 RoxygenNote: 7.2.3

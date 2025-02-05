@@ -6,9 +6,9 @@
 \usage{
 step3(
   project_title = "Project Title",
-  xpt_location = "./",
-  prog_location = "../programs/",
-  define_location = "./output/datasets/",
+  xpt_location = ".\\\\",
+  prog_location = "\\\\programs\\\\",
+  define_location = "\\\\datasets\\\\",
   range_character = "yes"
 )
 }
